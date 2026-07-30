@@ -1,6 +1,6 @@
 /**
  * Cat Room - SVG Room Renderer
- * Renders cozy room elements inside the enlarged LCD screen frame.
+ * Renders cozy room elements inside the LCD screen frame.
  */
 
 export class RoomRenderer {
@@ -72,10 +72,10 @@ export class RoomRenderer {
         </g>
 
         <!-- Rug Mat Center -->
-        <ellipse cx="210" cy="245" rx="65" ry="22" fill="#f8bbd0" opacity="0.65" stroke="#ff7597" stroke-dasharray="3,3" stroke-width="1.5" />
+        <ellipse cx="220" cy="245" rx="65" ry="22" fill="#f8bbd0" opacity="0.65" stroke="#ff7597" stroke-dasharray="3,3" stroke-width="1.5" />
 
-        <!-- Pixel Cat Center Stage -->
-        <g transform="translate(155, 110)">
+        <!-- Exact Reference Pixel Cat Center Stage -->
+        <g transform="translate(148, 110)">
           ${catSvgContent}
         </g>
       </svg>
