@@ -1,6 +1,6 @@
 /**
  * Cat Room - Main Application Bootstrap & Tamagotchi Controller
- * Configured for Pixel Tamagotchi UI & In-Screen HUD Metric Bars.
+ * 100vh Dashboard, 4 Matched Shell Buttons & Vertical HUD Integration.
  */
 
 import { GAME_CONFIG, STATE_TAGS } from './config.js';
@@ -48,14 +48,16 @@ class CatRoomApp {
     new CarePanel(this.dispatcher);
     new VirtualSensorPanel(this.dispatcher);
 
-    // Tamagotchi Shell Pearl Buttons (A, B, C)
-    const btnA = document.getElementById('btnTamagotchiA');
-    const btnB = document.getElementById('btnTamagotchiB');
-    const btnC = document.getElementById('btnTamagotchiC');
+    // 4 Matched Tamagotchi Shell Buttons
+    const btnShellFeed = document.getElementById('btnShellFeed');
+    const btnShellPet = document.getElementById('btnShellPet');
+    const btnShellPlay = document.getElementById('btnShellPlay');
+    const btnShellSleep = document.getElementById('btnShellSleep');
 
-    if (btnA) btnA.addEventListener('click', () => this.dispatcher.dispatch({ type: 'FEED', source: 'TAMAGOTCHI_BTN' }));
-    if (btnB) btnB.addEventListener('click', () => this.dispatcher.dispatch({ type: 'PET_SHORT', source: 'TAMAGOTCHI_BTN' }));
-    if (btnC) btnC.addEventListener('click', () => this.dispatcher.dispatch({ type: 'PLAY', source: 'TAMAGOTCHI_BTN' }));
+    if (btnShellFeed) btnShellFeed.addEventListener('click', () => this.dispatcher.dispatch({ type: 'FEED', source: 'TAMAGOTCHI_BTN' }));
+    if (btnShellPet) btnShellPet.addEventListener('click', () => this.dispatcher.dispatch({ type: 'PET_SHORT', source: 'TAMAGOTCHI_BTN' }));
+    if (btnShellPlay) btnShellPlay.addEventListener('click', () => this.dispatcher.dispatch({ type: 'PLAY', source: 'TAMAGOTCHI_BTN' }));
+    if (btnShellSleep) btnShellSleep.addEventListener('click', () => this.dispatcher.dispatch({ type: 'SLEEP', source: 'TAMAGOTCHI_BTN' }));
 
     // Decoration Drawer
     this.drawer = new DecorationDrawer(StorageManager, (updatedSlots) => {
@@ -121,6 +123,7 @@ class CatRoomApp {
 
     this.updateCatNameDisplay();
     this.renderRoom();
+    this.updateHUD();
   }
 
   updateCatNameDisplay() {
@@ -147,6 +150,7 @@ class CatRoomApp {
     StorageManager.saveData(this.storageData);
 
     this.renderRoom();
+    this.updateHUD();
   }
 
   handleSerialStatus(isConnected, msg) {
@@ -171,16 +175,32 @@ class CatRoomApp {
     if (!container) return;
 
     const catSvg = CatRenderer.renderSvg(this.catState.currentState);
-    const metricsData = {
-      hunger: this.catState.hunger,
-      happiness: this.catState.happiness,
-      affection: this.catState.affection,
-      energy: this.catState.energy,
-      stress: this.catState.stress
-    };
-    const roomSvg = RoomRenderer.renderRoomSvg(this.storageData.roomSlots, catSvg, metricsData);
+    const roomSvg = RoomRenderer.renderRoomSvg(this.storageData.roomSlots, catSvg);
 
     container.innerHTML = roomSvg;
+  }
+
+  updateHUD() {
+    const tagInfo = STATE_TAGS[this.catState.currentState] || STATE_TAGS.IDLE;
+    const behaviorTagEl = document.getElementById('catBehaviorTag');
+    if (behaviorTagEl) {
+      behaviorTagEl.textContent = tagInfo.label;
+      behaviorTagEl.style.color = tagInfo.color;
+    }
+
+    // Vertical Sidebar Metrics Progress Bars
+    this.setMetricBar('barHunger', 'valHunger', this.catState.hunger);
+    this.setMetricBar('barHappiness', 'valHappiness', this.catState.happiness);
+    this.setMetricBar('barAffection', 'valAffection', this.catState.affection);
+    this.setMetricBar('barEnergy', 'valEnergy', this.catState.energy);
+    this.setMetricBar('barStress', 'valStress', this.catState.stress);
+  }
+
+  setMetricBar(barId, valId, value) {
+    const bar = document.getElementById(barId);
+    const val = document.getElementById(valId);
+    if (bar) bar.style.width = `${value}%`;
+    if (val) val.textContent = `${value} / 100`;
   }
 
   startTickLoop() {
