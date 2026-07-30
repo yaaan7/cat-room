@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cat Room - 🐾 인터랙티브 고양이 육성 웹 게임</title>
-  <meta name="description" content="귀여운 고양이를 돌보고 방을 꾸미는 웹 기반 육성 게임 & Arduino 피지컬 연동 샌드박스">
+  <title>Cat Room - 🐾 레트로 다마고치 고양이 육성 웹 게임</title>
+  <meta name="description" content="레트로 다마고치 내에서 귀여운 고양이를 돌보고 방을 꾸미는 웹 기반 육성 게임 & Arduino 피지컬 연동 샌드박스">
   <link rel="stylesheet" href="index.css">
 </head>
 <body>
@@ -29,13 +29,47 @@
   <!-- Main Application Container -->
   <main class="app-container">
     
-    <!-- Stage: Main Room & Cat Canvas -->
-    <section class="room-stage-card">
-      <div id="speechBubble" class="speech-bubble-overlay">
-        <span id="speechBubbleText">반가워요! 당신의 관심이 필요해요.</span>
-      </div>
-      <div id="roomCanvasContainer" class="room-canvas-container">
-        <!-- SVG Canvas Injected by JS -->
+    <!-- Tamagotchi Shell Centerpiece -->
+    <section class="tamagotchi-shell-card">
+      <div class="tamagotchi-device">
+        <div class="tamagotchi-ring-hook"></div>
+        <div class="tamagotchi-brand-text">TAMAGOTCHI CAT</div>
+
+        <!-- Retro LCD Screen Frame -->
+        <div class="tamagotchi-screen-frame">
+          <div class="lcd-status-bar">
+            <div class="lcd-icon-item" title="배고픔">🐟 <span id="lcdValHunger">30</span></div>
+            <div class="lcd-icon-item" title="행복도">💕 <span id="lcdValHappiness">70</span></div>
+            <div class="lcd-icon-item" title="에너지">⚡ <span id="lcdValEnergy">80</span></div>
+            <div class="lcd-icon-item" title="스트레스">💢 <span id="lcdValStress">10</span></div>
+          </div>
+
+          <div id="speechBubble" class="speech-bubble-overlay">
+            <span id="speechBubbleText">반가워요! 당신의 관심이 필요해요.</span>
+          </div>
+
+          <div id="roomCanvasContainer" class="room-stage-container">
+            <!-- SVG Canvas Injected by JS -->
+          </div>
+        </div>
+
+        <!-- Physical Tamagotchi Shell Buttons -->
+        <div class="tamagotchi-buttons-row">
+          <button id="btnTamagotchiA" class="tamagotchi-physical-btn" title="A: 밥 주기">
+            <span style="font-size:16px;">🐟</span>
+            <span class="btn-label">A</span>
+          </button>
+
+          <button id="btnTamagotchiB" class="tamagotchi-physical-btn" title="B: 쓰다듬기">
+            <span style="font-size:16px;">🖐️</span>
+            <span class="btn-label">B</span>
+          </button>
+
+          <button id="btnTamagotchiC" class="tamagotchi-physical-btn" title="C: 놀아주기">
+            <span style="font-size:16px;">🧶</span>
+            <span class="btn-label">C</span>
+          </button>
+        </div>
       </div>
     </section>
 
@@ -105,19 +139,19 @@
         <button id="btnCareFeed" class="care-btn">
           <span class="btn-icon">🐟</span>
           <span>밥 주기</span>
-          <span class="action-shortcut">단축키 1</span>
+          <span class="action-shortcut">단축키 1 / A</span>
         </button>
 
         <button id="btnCarePet" class="care-btn">
           <span class="btn-icon">🖐️</span>
           <span>쓰다듬기</span>
-          <span class="action-shortcut">단축키 2</span>
+          <span class="action-shortcut">단축키 2 / B</span>
         </button>
 
         <button id="btnCarePlay" class="care-btn">
           <span class="btn-icon">🧶</span>
           <span>놀아주기</span>
-          <span class="action-shortcut">단축키 3</span>
+          <span class="action-shortcut">단축키 3 / C</span>
         </button>
 
         <button id="btnCareSleep" class="care-btn">
@@ -182,7 +216,7 @@
   <div id="modalOnboardingBackdrop" class="modal-backdrop">
     <div class="modal-box">
       <h2>🐱 고양이의 이름을 정해 주세요!</h2>
-      <p style="color:var(--text-muted); font-size:14px;">방에 찾아온 귀여운 고양이에게 특별한 이름을 선물하세요.</p>
+      <p style="color:var(--text-muted); font-size:14px;">다마고치에 찾아온 귀여운 고양이에게 특별한 이름을 선물하세요.</p>
       <input type="text" id="inputCatName" class="form-input" placeholder="고양이 이름 (예: 나비)" maxlength="12">
       <button id="btnSaveCatName" class="secondary-btn" style="width:100%; justify-content:center;">입력 완료</button>
     </div>
