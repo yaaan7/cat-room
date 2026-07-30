@@ -2,8 +2,9 @@
  * Cat Room - Unified Game Event Dispatcher
  */
 
-import { GAME_CONFIG } from '../config.js';
+import { GAME_CONFIG, ITEM_CATALOG } from '../config.js';
 import { TemplateEngine } from './templates.js';
+import { ToastManager } from '../ui/toast.js';
 
 export class GameEventDispatcher {
   constructor(catState, storageManager, uiCallback) {
@@ -81,7 +82,7 @@ export class GameEventDispatcher {
     // Get Natural Language Reaction Quote
     const reactionText = TemplateEngine.getReaction(actionName, result.reason);
 
-    // Check & Trigger Item Unlocks
+    // Dynamic Check & Trigger Item Unlocks across all catalog items
     this.checkUnlockableItems();
 
     // Trigger Full UI Update Callback
@@ -105,34 +106,37 @@ export class GameEventDispatcher {
     const data = this.storageManager.loadData();
     const counters = data.counters || {};
     const unlocked = new Set(data.unlockedItems || []);
+    const newlyUnlocked = [];
 
-    let newUnlock = false;
+    for (const slotKey in ITEM_CATALOG) {
+      const items = ITEM_CATALOG[slotKey];
+      items.forEach(item => {
+        if (item.default || unlocked.has(item.id)) return;
+        if (!item.unlockCondition) return;
 
-    if (counters.feedCount >= 1 && !unlocked.has('cushion_fish')) {
-      unlocked.add('cushion_fish');
-      newUnlock = true;
-    }
-    if (counters.feedCount >= 1 && !unlocked.has('wp_pink')) {
-      unlocked.add('wp_pink');
-      newUnlock = true;
-    }
-    if (this.catState.affection >= 50 && !unlocked.has('tower_wood')) {
-      unlocked.add('tower_wood');
-      newUnlock = true;
-    }
-    if (counters.captureCount >= 3 && !unlocked.has('wall_calendar')) {
-      unlocked.add('wall_calendar');
-      newUnlock = true;
-    }
-    if (data.flags?.hasConnectedArduino && !unlocked.has('toy_circuit')) {
-      unlocked.add('toy_circuit');
-      unlocked.add('wall_light');
-      newUnlock = true;
+        const [key, val] = item.unlockCondition.split(':');
+        let isMet = false;
+
+        if (key === 'feedCount') isMet = (counters.feedCount || 0) >= parseInt(val, 10);
+        else if (key === 'petCount') isMet = (counters.petCount || 0) >= parseInt(val, 10);
+        else if (key === 'playCount') isMet = (counters.playCount || 0) >= parseInt(val, 10);
+        else if (key === 'captureCount') isMet = (counters.captureCount || 0) >= parseInt(val, 10);
+        else if (key === 'affection') isMet = (this.catState.affection || 0) >= parseInt(val, 10);
+        else if (key === 'arduinoConnected') isMet = data.flags?.hasConnectedArduino === true;
+
+        if (isMet) {
+          unlocked.add(item.id);
+          newlyUnlocked.push(item);
+        }
+      });
     }
 
-    if (newUnlock) {
+    if (newlyUnlocked.length > 0) {
       data.unlockedItems = Array.from(unlocked);
       this.storageManager.saveData(data);
+      newlyUnlocked.forEach(item => {
+        ToastManager.show(`🎁 새 아이템 해금: ${item.name} (${item.icon})!`);
+      });
     }
   }
 }

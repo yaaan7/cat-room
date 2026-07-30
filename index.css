@@ -1,4 +1,4 @@
-/* Cat Room - 100vh Single Dashboard & Sleek Vertically Elongated 3D Tamagotchi */
+/* Cat Room - 100vh Single Dashboard & Sleek 3D Tamagotchi System */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Press+Start+2P&family=Noto+Sans+KR:wght@400;500;700&display=swap');
 
 :root {
@@ -241,7 +241,7 @@ body {
 .metric-bar-fill.energy { background: #70a1ff; }
 .metric-bar-fill.stress { background: #a55eea; }
 
-/* Center Stage: Vertically Elongated 3D Tamagotchi Shell (NO WHITE BORDER STROKE) */
+/* Center Stage: Vertically Elongated 3D Tamagotchi Shell (Screen Clipped 100% Inside) */
 .center-tamagotchi-stage {
   display: flex;
   align-items: center;
@@ -250,17 +250,18 @@ body {
 }
 
 .tamagotchi-shell-3d {
-  width: 580px;
-  min-height: 540px; /* Vertically elongated sleek egg shape */
+  width: 620px;
+  min-height: 560px; /* Vertically elongated sleek egg shape */
   background: var(--shell-3d-gradient);
-  border: none; /* STROKE REMOVED AS REQUESTED */
-  border-radius: 290px 290px 240px 240px;
-  padding: 32px 38px 42px 38px;
+  border: none; /* NO WHITE STROKE BORDER */
+  border-radius: 310px 310px 260px 260px;
+  padding: 34px 44px 44px 44px;
   box-shadow: var(--shell-shadow);
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
+  overflow: hidden; /* Clips any screen overflow inside the shell */
 }
 
 /* Top Heart Ring Hook */
@@ -283,11 +284,11 @@ body {
   margin-bottom: 14px;
 }
 
-/* LCD Screen Frame Fitted inside Shell */
+/* LCD Screen Frame Fitted Perfectly inside Shell Boundary */
 .tamagotchi-screen-frame {
   width: 100%;
-  max-width: 440px;
-  height: 330px;
+  max-width: 420px;
+  height: 310px;
   background: #ffffff;
   border: 6px solid #f8bbd0;
   border-radius: 24px;
@@ -309,6 +310,7 @@ body {
   display: block;
 }
 
+/* Single Line Speech Bubble Overlay (No Awkward Wrap) */
 .speech-bubble-overlay {
   position: absolute;
   top: 14px;
@@ -316,18 +318,20 @@ body {
   transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.95);
   border: 1.5px solid var(--primary-pink);
-  padding: 8px 18px;
+  padding: 6px 16px;
   border-radius: 18px;
   color: #333333;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  max-width: 90%;
-  text-align: center;
+  max-width: 95%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   z-index: 10;
 }
 
-/* 4 Physical Matched Tamagotchi Buttons on Shell Bottom */
+/* 4 Physical Matched Tamagotchi Buttons on Shell Bottom (NO WHITE STROKE) */
 .tamagotchi-4buttons-row {
   display: flex;
   justify-content: center;
@@ -340,7 +344,7 @@ body {
   width: 66px;
   height: 66px;
   border-radius: 50%;
-  border: 3px solid #ffffff;
+  border: none; /* NO WHITE STROKE BORDER */
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22), inset 0 -4px 8px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   display: flex;
