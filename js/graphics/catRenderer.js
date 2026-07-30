@@ -1,197 +1,234 @@
 /**
- * Cat Room - Exact Reference Pixel Cat Character Graphic Renderer
- * Matches the user-provided 16x16 retro pixel cat reference image!
+ * Cat Room - High-Resolution 32x32 Pixel Art Cat Character Renderer
+ * Uses a dense 32x32 pixel grid (p = 3.5) for ultra-detailed, highly expressive retro kitten artwork.
  */
 
 import { BEHAVIOR_STATES } from '../config.js';
 
 export class CatRenderer {
   static renderSvg(state = BEHAVIOR_STATES.IDLE) {
-    const p = 8; // Pixel size (8px per pixel grid unit)
+    const p = 3.5; // High-resolution 32x32 grid unit size
 
-    // Helper function for pixel blocks
+    // Helper for pixel blocks
     const px = (x, y, w = 1, h = 1, color = "#000000") => 
       `<rect x="${x * p}" y="${y * p}" width="${w * p}" height="${h * p}" fill="${color}" />`;
 
-    // Base Color Palette from Reference Image
-    const C_OUTLINE = "#000000";     // Solid Black 1px Outline
-    const C_WHITE   = "#ffffff";     // White Fur Body
-    const C_EYE_BLUE= "#00a8ff";     // Glistening Blue Eye Pixel
-    const C_EYE_DARK= "#2d3436";     // Dark Eye Pupil
-    const C_PINK    = "#ff9ebb";     // Soft Pink Blush Cheeks
-    const C_EAR_PINK = "#ffcdd2";    // Inner Ear Pink
-    const C_BLUE    = "#70a1ff";     // Water / Sweat Blue
-    const C_RED     = "#ff4757";     // Heart / Angry Red
-    const C_PURPLE  = "#a55eea";     // Zzz Purple
+    // High-Res Palette
+    const C_OUTLINE   = "#2d3436";
+    const C_WHITE     = "#ffffff";
+    const C_SHADOW    = "#fff0f5";
+    const C_PINK      = "#ff7597";
+    const C_LIGHT_PINK= "#ffb7c5";
+    const C_DARK_PINK = "#d81b60";
+    const C_EYE_BLUE  = "#70a1ff";
+    const C_EYE_DARK  = "#1e90ff";
+    const C_EYE_PUPIL = "#0f172a";
+    const C_RED       = "#ff4757";
+    const C_PURPLE    = "#a55eea";
 
-    let bodyPixels = "";
+    let pixels = "";
 
-    // 1. Black Outline Silhouette (16x16 Grid)
-    // Left Ear Outline
-    bodyPixels += px(2, 0, 3, 1, C_OUTLINE);
-    bodyPixels += px(1, 1, 1, 4, C_OUTLINE);
-    bodyPixels += px(4, 1, 1, 4, C_OUTLINE);
+    // 1. High-Res Triangular Ears (Left & Right)
+    // Left Ear
+    pixels += px(5, 2, 5, 2, C_OUTLINE);
+    pixels += px(4, 4, 7, 6, C_OUTLINE);
+    pixels += px(6, 4, 3, 5, C_LIGHT_PINK); // Inner Ear
+    pixels += px(7, 5, 1, 3, C_DARK_PINK);
 
-    // Right Ear Outline
-    bodyPixels += px(10, 0, 3, 1, C_OUTLINE);
-    bodyPixels += px(9, 1, 1, 4, C_OUTLINE);
-    bodyPixels += px(12, 1, 1, 4, C_OUTLINE);
+    // Right Ear
+    pixels += px(22, 2, 5, 2, C_OUTLINE);
+    pixels += px(21, 4, 7, 6, C_OUTLINE);
+    pixels += px(23, 4, 3, 5, C_LIGHT_PINK); // Inner Ear
+    pixels += px(24, 5, 1, 3, C_DARK_PINK);
 
-    // Head Top Outline
-    bodyPixels += px(5, 2, 4, 1, C_OUTLINE);
+    // 2. High-Res Head Outline & Fur
+    pixels += px(8, 5, 16, 2, C_OUTLINE);  // Top Head Outline
+    pixels += px(3, 10, 26, 12, C_OUTLINE); // Head Main Box
+    pixels += px(4, 11, 24, 10, C_WHITE);   // Face White Fill
 
-    // Head Outer Side Outlines
-    bodyPixels += px(0, 4, 1, 5, C_OUTLINE);
-    bodyPixels += px(13, 4, 1, 5, C_OUTLINE);
+    // Fur Shading / Fluff Cheek Tufts
+    pixels += px(4, 15, 2, 4, C_SHADOW);
+    pixels += px(26, 15, 2, 4, C_SHADOW);
 
-    // Head Bottom Outline
-    bodyPixels += px(1, 9, 12, 1, C_OUTLINE);
+    // Head Top Black Patch Accent
+    pixels += px(5, 7, 7, 3, C_OUTLINE);
+    pixels += px(20, 7, 7, 3, C_OUTLINE);
 
-    // Body Outer Outlines
-    bodyPixels += px(1, 10, 1, 5, C_OUTLINE);
-    bodyPixels += px(12, 10, 1, 5, C_OUTLINE);
-
-    // Inverted 'V' Leg Gap Outline
-    bodyPixels += px(5, 12, 1, 3, C_OUTLINE);
-    bodyPixels += px(8, 12, 1, 3, C_OUTLINE);
-    bodyPixels += px(6, 11, 2, 1, C_OUTLINE);
-    bodyPixels += px(2, 14, 10, 1, C_OUTLINE);
-
-    // Diagonal Tail Outline (pointing up-right)
-    bodyPixels += px(13, 12, 2, 1, C_OUTLINE);
-    bodyPixels += px(14, 10, 2, 1, C_OUTLINE);
-    bodyPixels += px(15, 8, 2, 1, C_OUTLINE);
-    bodyPixels += px(16, 6, 2, 1, C_OUTLINE);
-    bodyPixels += px(17, 6, 1, 3, C_OUTLINE);
-
-    // 2. White Fur Fill
-    // Inner Ears
-    bodyPixels += px(2, 1, 2, 3, C_WHITE);
-    bodyPixels += px(3, 2, 1, 2, C_EAR_PINK); // Inner Left Ear Pink
-
-    bodyPixels += px(10, 1, 2, 3, C_WHITE);
-    bodyPixels += px(10, 2, 1, 2, C_EAR_PINK); // Inner Right Ear Pink
-
-    // Head Fill
-    bodyPixels += px(1, 4, 12, 5, C_WHITE);
-
-    // Body & Legs Fill
-    bodyPixels += px(2, 10, 10, 4, C_WHITE);
-    bodyPixels += px(13, 11, 2, 2, C_WHITE); // Tail Fill Base
-    bodyPixels += px(15, 9, 2, 2, C_WHITE);  // Tail Fill Tip
-
-    // 3. Facial Features & Expressions per State
+    // 3. Detailed Glistening Anime Pixel Eyes & Face
     let emotionOverlay = "";
 
     switch (state) {
       case BEHAVIOR_STATES.HAPPY:
         // Eye Winks ^ ^
-        bodyPixels += px(3, 5, 2, 1, C_OUTLINE);
-        bodyPixels += px(9, 5, 2, 1, C_OUTLINE);
+        pixels += px(8, 14, 5, 2, C_OUTLINE);
+        pixels += px(7, 15, 2, 2, C_OUTLINE);
+        pixels += px(11, 15, 2, 2, C_OUTLINE);
+
+        pixels += px(19, 14, 5, 2, C_OUTLINE);
+        pixels += px(18, 15, 2, 2, C_OUTLINE);
+        pixels += px(22, 15, 2, 2, C_OUTLINE);
 
         // Open Smile Mouth
-        bodyPixels += px(6, 7, 2, 1, C_PINK);
+        pixels += px(15, 17, 2, 3, C_DARK_PINK);
 
-        // Floating Pixel Hearts
+        // Pixel Hearts
         emotionOverlay += `
           <g class="anim-purr">
-            ${px(0, 1, 2, 2, C_PINK)}
-            ${px(15, 2, 2, 2, C_RED)}
+            ${px(1, 4, 4, 3, C_PINK)}
+            ${px(2, 3, 2, 1, C_PINK)}
+            ${px(27, 5, 4, 3, C_RED)}
+            ${px(28, 4, 2, 1, C_RED)}
           </g>
         `;
         break;
 
       case BEHAVIOR_STATES.HUNGRY:
-        // Big Black Eyes
-        bodyPixels += px(3, 5, 2, 2, C_EYE_DARK);
-        bodyPixels += px(3, 5, 1, 1, C_WHITE);
+        // Wide Pupils
+        pixels += px(8, 13, 5, 5, C_EYE_PUPIL);
+        pixels += px(9, 14, 2, 2, C_WHITE);
 
-        bodyPixels += px(9, 5, 2, 2, C_EYE_DARK);
-        bodyPixels += px(9, 5, 1, 1, C_WHITE);
+        pixels += px(19, 13, 5, 5, C_EYE_PUPIL);
+        pixels += px(20, 14, 2, 2, C_WHITE);
 
-        // Mouth & Drool
-        bodyPixels += px(6, 7, 2, 1, C_OUTLINE);
-        emotionOverlay += px(7, 8, 1, 2, C_BLUE);
+        // Drool
+        pixels += px(15, 18, 2, 2, C_OUTLINE);
+        emotionOverlay += px(16, 20, 2, 4, C_EYE_BLUE);
         break;
 
       case BEHAVIOR_STATES.SLEEPY:
-        // Flat Eyes - -
-        bodyPixels += px(3, 6, 2, 1, C_OUTLINE);
-        bodyPixels += px(9, 6, 2, 1, C_OUTLINE);
-        bodyPixels += px(6, 7, 2, 1, C_PINK); // Yawn
+        // Flat Lines - -
+        pixels += px(8, 15, 5, 2, C_OUTLINE);
+        pixels += px(19, 15, 5, 2, C_OUTLINE);
+        pixels += px(14, 17, 4, 3, C_LIGHT_PINK); // Yawn
         break;
 
       case BEHAVIOR_STATES.SLEEPING:
         // Closed Eyes u u
-        bodyPixels += px(3, 6, 2, 1, C_OUTLINE);
-        bodyPixels += px(9, 6, 2, 1, C_OUTLINE);
-        bodyPixels += px(6, 7, 2, 1, C_OUTLINE);
+        pixels += px(8, 15, 5, 2, C_OUTLINE);
+        pixels += px(8, 14, 2, 2, C_OUTLINE);
+        pixels += px(11, 14, 2, 2, C_OUTLINE);
 
-        // Floating Zzz
+        pixels += px(19, 15, 5, 2, C_OUTLINE);
+        pixels += px(19, 14, 2, 2, C_OUTLINE);
+        pixels += px(22, 14, 2, 2, C_OUTLINE);
+
+        pixels += px(15, 17, 2, 1, C_OUTLINE);
+
+        // Floating High-Res Zzz
         emotionOverlay += `
           <g class="anim-sleep">
-            ${px(14, 2, 3, 1, C_PURPLE)}
-            ${px(16, 3, 1, 1, C_PURPLE)}
-            ${px(15, 4, 1, 1, C_PURPLE)}
-            ${px(14, 5, 3, 1, C_PURPLE)}
+            ${px(25, 4, 5, 2, C_PURPLE)}
+            ${px(28, 6, 2, 2, C_PURPLE)}
+            ${px(26, 8, 2, 2, C_PURPLE)}
+            ${px(25, 10, 5, 2, C_PURPLE)}
           </g>
         `;
         break;
 
       case BEHAVIOR_STATES.STARTLED:
-        // Shocked Eyes
-        bodyPixels += px(3, 5, 2, 2, C_OUTLINE);
-        bodyPixels += px(4, 5, 1, 1, C_WHITE);
+        // Shocked Eyes O O
+        pixels += px(8, 13, 5, 5, C_OUTLINE);
+        pixels += px(10, 15, 2, 2, C_EYE_PUPIL);
 
-        bodyPixels += px(9, 5, 2, 2, C_OUTLINE);
-        bodyPixels += px(10, 5, 1, 1, C_WHITE);
+        pixels += px(19, 13, 5, 5, C_OUTLINE);
+        pixels += px(21, 15, 2, 2, C_EYE_PUPIL);
 
-        bodyPixels += px(6, 7, 2, 1, C_OUTLINE);
+        pixels += px(15, 18, 2, 3, C_OUTLINE);
 
-        emotionOverlay += px(14, 3, 2, 3, C_BLUE); // Sweat drop
+        emotionOverlay += px(27, 6, 3, 5, C_EYE_BLUE); // Sweat drop
         break;
 
       case BEHAVIOR_STATES.ANGRY:
-        // Slanted Angry Eyes
-        bodyPixels += px(3, 5, 2, 1, C_RED);
-        bodyPixels += px(9, 5, 2, 1, C_RED);
-        bodyPixels += px(6, 7, 2, 1, C_RED);
+        // Angry Slanted Eyebrows
+        pixels += px(7, 13, 6, 2, C_RED);
+        pixels += px(9, 15, 3, 3, C_EYE_PUPIL);
+
+        pixels += px(19, 13, 6, 2, C_RED);
+        pixels += px(20, 15, 3, 3, C_EYE_PUPIL);
+
+        pixels += px(14, 18, 4, 2, C_RED);
 
         emotionOverlay += `
           <g class="anim-shake">
-            ${px(14, 2, 3, 1, C_RED)}
-            ${px(15, 1, 1, 3, C_RED)}
+            ${px(26, 4, 5, 2, C_RED)}
+            ${px(28, 2, 2, 6, C_RED)}
           </g>
         `;
         break;
 
       case BEHAVIOR_STATES.INDIFFERENT:
-        bodyPixels += px(4, 6, 1, 1, C_OUTLINE);
-        bodyPixels += px(10, 6, 1, 1, C_OUTLINE);
-        bodyPixels += px(6, 7, 2, 1, C_OUTLINE);
+        pixels += px(10, 14, 3, 3, C_EYE_PUPIL);
+        pixels += px(21, 14, 3, 3, C_EYE_PUPIL);
+        pixels += px(15, 17, 2, 1, C_OUTLINE);
         break;
 
-      default: // IDLE (Exact Reference Image Eyes: Glistening Blue Dots + Nose Dot + Pink Blush)
-        bodyPixels += px(3, 6, 1, 1, C_EYE_BLUE);  // Left Blue Eye Pixel
-        bodyPixels += px(10, 6, 1, 1, C_EYE_BLUE); // Right Blue Eye Pixel
-        bodyPixels += px(6, 6, 1, 1, C_OUTLINE);   // Center Nose Pixel Dot
+      default: // IDLE (Detailed Anime Pixel Eyes: Iris + Highlights + Nose ▲ + Mouth ω)
+        // Left Eye
+        pixels += px(8, 13, 5, 5, C_OUTLINE);
+        pixels += px(9, 14, 3, 3, C_EYE_BLUE);
+        pixels += px(9, 14, 2, 2, C_EYE_DARK);
+        pixels += px(9, 14, 1, 1, C_WHITE); // Sparkle
+
+        // Right Eye
+        pixels += px(19, 13, 5, 5, C_OUTLINE);
+        pixels += px(20, 14, 3, 3, C_EYE_BLUE);
+        pixels += px(20, 14, 2, 2, C_EYE_DARK);
+        pixels += px(20, 14, 1, 1, C_WHITE); // Sparkle
+
+        // Nose (▲) & Mouth (ω)
+        pixels += px(15, 15, 2, 2, C_RED);       // Pink Nose
+        pixels += px(13, 17, 3, 1, C_OUTLINE);   // Left mouth Q
+        pixels += px(16, 17, 3, 1, C_OUTLINE);   // Right mouth Q
         break;
     }
 
-    // Soft Pink Blush Cheeks (Exact match to reference image!)
-    bodyPixels += px(2, 7, 2, 1, C_PINK);
-    bodyPixels += px(10, 7, 2, 1, C_PINK);
+    // High-Res Blush Cheeks
+    pixels += px(5, 16, 3, 2, C_LIGHT_PINK);
+    pixels += px(24, 16, 3, 2, C_LIGHT_PINK);
+
+    // Whiskers
+    pixels += px(1, 15, 4, 1, C_OUTLINE);
+    pixels += px(0, 17, 4, 1, C_OUTLINE);
+    pixels += px(27, 15, 4, 1, C_OUTLINE);
+    pixels += px(28, 17, 4, 1, C_OUTLINE);
+
+    // 4. Body, Chest Fluff, Paws & Tail
+    pixels += px(6, 21, 20, 10, C_OUTLINE); // Body Box
+    pixels += px(7, 22, 18, 8, C_WHITE);   // Body Fill
+
+    // Fluffy Chest Tuft
+    pixels += px(12, 22, 8, 5, C_SHADOW);
+
+    // Paws & Toe Beans
+    pixels += px(4, 24, 4, 5, C_WHITE);    // Left Paw
+    pixels += px(4, 24, 4, 1, C_OUTLINE);
+    pixels += px(5, 27, 2, 2, C_PINK);     // Toe Bean
+
+    pixels += px(24, 24, 4, 5, C_WHITE);   // Right Paw
+    pixels += px(24, 24, 4, 1, C_OUTLINE);
+    pixels += px(25, 27, 2, 2, C_PINK);    // Toe Bean
+
+    // Feet
+    pixels += px(9, 29, 4, 3, C_WHITE);    // Left Foot
+    pixels += px(9, 31, 4, 1, C_OUTLINE);
+    pixels += px(19, 29, 4, 3, C_WHITE);   // Right Foot
+    pixels += px(19, 31, 4, 1, C_OUTLINE);
+
+    // Fluffy Pixel Tail
+    pixels += px(26, 26, 4, 3, C_OUTLINE);
+    pixels += px(28, 23, 4, 3, C_OUTLINE);
+    pixels += px(29, 20, 3, 3, C_OUTLINE);
 
     const animClass = (state === BEHAVIOR_STATES.SLEEPING) ? 'anim-sleep' :
                       (state === BEHAVIOR_STATES.ANGRY || state === BEHAVIOR_STATES.STARTLED) ? 'anim-shake' : 'anim-purr';
 
     return `
-      <g id="catExactPixelGroup" class="${animClass}" shape-rendering="crispEdges">
-        <!-- Shadow -->
-        <rect x="8" y="118" width="96" height="8" fill="rgba(0,0,0,0.12)" />
+      <g id="catHighResPixelGroup" class="${animClass}" shape-rendering="crispEdges">
+        <!-- Ground Shadow -->
+        <rect x="20" y="112" width="80" height="6" fill="rgba(0,0,0,0.12)" />
         
-        <!-- Exact Reference Image Pixel Cat Sprite -->
-        ${bodyPixels}
+        <!-- 32x32 Dense Pixel Cat Sprite -->
+        ${pixels}
 
         <!-- Dynamic Emotion Overlays -->
         ${emotionOverlay}
