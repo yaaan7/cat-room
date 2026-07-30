@@ -8,7 +8,7 @@
   /* 3D Skeuomorphic Shell Gradient */
   --shell-3d-gradient: linear-gradient(145deg, #ff9ebb 0%, #ff70a6 45%, #f78fb3 100%);
   --shell-rim: #ffffff;
-  --shell-shadow: 0 28px 60px rgba(255, 112, 166, 0.48), 0 10px 20px rgba(0,0,0,0.14);
+  --shell-shadow: 0 32px 70px rgba(255, 112, 166, 0.5), 0 12px 24px rgba(0,0,0,0.15);
   
   /* Pastel Buttons Palette */
   --btn-feed-bg: #ffebee;
@@ -142,8 +142,8 @@ body {
   flex: 1;
   display: grid;
   grid-template-columns: 280px 1fr 280px;
-  gap: 24px;
-  padding: 16px 28px;
+  gap: 20px;
+  padding: 12px 24px;
   height: calc(100vh - 60px);
   overflow: hidden;
   align-items: center;
@@ -242,7 +242,7 @@ body {
 .metric-bar-fill.energy { background: #70a1ff; }
 .metric-bar-fill.stress { background: #a55eea; }
 
-/* Center Stage: Spacious & Enlarged 3D Glossy Tamagotchi Shell */
+/* Center Stage: HUGE 3D Tamagotchi Outer Shell (720px Width) */
 .center-tamagotchi-stage {
   display: flex;
   align-items: center;
@@ -251,11 +251,12 @@ body {
 }
 
 .tamagotchi-shell-3d {
-  width: 540px; /* Significantly enlarged outer egg shell */
+  width: 720px; /* ENLARGED OUTER EGG SHELL TO MATCH USER ANNOTATION */
+  max-width: 96%;
   background: var(--shell-3d-gradient);
-  border: 9px solid #ffffff;
-  border-radius: 270px 270px 240px 240px;
-  padding: 26px 32px 34px 32px;
+  border: 10px solid #ffffff;
+  border-radius: 360px 360px 320px 320px;
+  padding: 26px 40px 34px 40px;
   box-shadow: var(--shell-shadow);
   display: flex;
   flex-direction: column;
@@ -266,27 +267,27 @@ body {
 /* Top Heart Ring Hook */
 .tamagotchi-heart-hook {
   position: absolute;
-  top: -26px;
-  width: 48px;
-  height: 48px;
+  top: -28px;
+  width: 52px;
+  height: 52px;
   background: #ffffff;
-  clip-path: path("M 24 44 C 24 44 4 30 4 15 C 4 7 12 0 21 0 C 26 0 30 4 32 8 C 34 4 38 0 43 0 C 52 0 60 7 60 15 C 60 30 40 44 40 44 Z");
-  transform: scale(0.75);
+  clip-path: path("M 26 48 C 26 48 4 33 4 17 C 4 8 13 0 23 0 C 28 0 33 4 35 9 C 37 4 42 0 47 0 C 57 0 66 8 66 17 C 66 33 44 48 44 48 Z");
+  transform: scale(0.8);
 }
 
 .tamagotchi-title-text {
   font-family: 'Press Start 2P', cursive, sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   color: #ffffff;
   text-shadow: 0 2px 4px rgba(216, 27, 96, 0.5);
   margin-bottom: 14px;
 }
 
-/* Spacious LCD Screen Frame Fitted inside Shell */
+/* LCD Screen Frame Fitted inside Shell */
 .tamagotchi-screen-frame {
   width: 100%;
-  max-width: 450px;
-  height: 340px;
+  max-width: 480px;
+  height: 350px;
   background: #ffffff;
   border: 7px solid #f8bbd0;
   border-radius: 24px;
@@ -330,24 +331,24 @@ body {
 .tamagotchi-4buttons-row {
   display: flex;
   justify-content: center;
-  gap: 24px;
+  gap: 28px;
   margin-top: 22px;
   width: 100%;
 }
 
 .shell-4btn {
-  width: 66px;
-  height: 66px;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
   border: 3.5px solid #ffffff;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.22), inset 0 -4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22), inset 0 -4px 8px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
-  font-size: 22px;
+  font-size: 24px;
 }
 
 .shell-4btn.feed { background: linear-gradient(145deg, #ffffff, #ffcdd2); }
