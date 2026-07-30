@@ -1,5 +1,6 @@
 /**
  * Cat Room - Main Application Bootstrap & Tamagotchi Controller
+ * Configured for Pixel Tamagotchi UI & In-Screen HUD Metric Bars.
  */
 
 import { GAME_CONFIG, STATE_TAGS } from './config.js';
@@ -47,7 +48,7 @@ class CatRoomApp {
     new CarePanel(this.dispatcher);
     new VirtualSensorPanel(this.dispatcher);
 
-    // Tamagotchi Physical Buttons (A, B, C)
+    // Tamagotchi Shell Pearl Buttons (A, B, C)
     const btnA = document.getElementById('btnTamagotchiA');
     const btnB = document.getElementById('btnTamagotchiB');
     const btnC = document.getElementById('btnTamagotchiC');
@@ -120,12 +121,11 @@ class CatRoomApp {
 
     this.updateCatNameDisplay();
     this.renderRoom();
-    this.updateHUD();
   }
 
   updateCatNameDisplay() {
     const badge = document.getElementById('catNameBadge');
-    if (badge) badge.textContent = `🐱 ${this.catState.name}`;
+    if (badge) badge.textContent = this.catState.name;
   }
 
   handleGameUpdate(payload) {
@@ -147,18 +147,13 @@ class CatRoomApp {
     StorageManager.saveData(this.storageData);
 
     this.renderRoom();
-    this.updateHUD();
   }
 
   handleSerialStatus(isConnected, msg) {
     const dot = document.getElementById('serialStatusDot');
-    const label = document.getElementById('serialStatusText');
 
     if (dot) {
       dot.className = `status-dot ${isConnected ? 'connected' : 'disconnected'}`;
-    }
-    if (label) {
-      label.textContent = msg;
     }
 
     if (isConnected) {
@@ -176,43 +171,16 @@ class CatRoomApp {
     if (!container) return;
 
     const catSvg = CatRenderer.renderSvg(this.catState.currentState);
-    const roomSvg = RoomRenderer.renderRoomSvg(this.storageData.roomSlots, catSvg);
+    const metricsData = {
+      hunger: this.catState.hunger,
+      happiness: this.catState.happiness,
+      affection: this.catState.affection,
+      energy: this.catState.energy,
+      stress: this.catState.stress
+    };
+    const roomSvg = RoomRenderer.renderRoomSvg(this.storageData.roomSlots, catSvg, metricsData);
 
     container.innerHTML = roomSvg;
-  }
-
-  updateHUD() {
-    const tagInfo = STATE_TAGS[this.catState.currentState] || STATE_TAGS.IDLE;
-    const behaviorTagEl = document.getElementById('catBehaviorTag');
-    if (behaviorTagEl) {
-      behaviorTagEl.textContent = tagInfo.label;
-      behaviorTagEl.style.color = tagInfo.color;
-    }
-
-    // Main HUD Bars
-    this.setMetricBar('barHunger', 'valHunger', this.catState.hunger);
-    this.setMetricBar('barHappiness', 'valHappiness', this.catState.happiness);
-    this.setMetricBar('barAffection', 'valAffection', this.catState.affection);
-    this.setMetricBar('barEnergy', 'valEnergy', this.catState.energy);
-    this.setMetricBar('barStress', 'valStress', this.catState.stress);
-
-    // Tamagotchi LCD Top Mini Indicators
-    const lcdHunger = document.getElementById('lcdValHunger');
-    const lcdHappiness = document.getElementById('lcdValHappiness');
-    const lcdEnergy = document.getElementById('lcdValEnergy');
-    const lcdStress = document.getElementById('lcdValStress');
-
-    if (lcdHunger) lcdHunger.textContent = this.catState.hunger;
-    if (lcdHappiness) lcdHappiness.textContent = this.catState.happiness;
-    if (lcdEnergy) lcdEnergy.textContent = this.catState.energy;
-    if (lcdStress) lcdStress.textContent = this.catState.stress;
-  }
-
-  setMetricBar(barId, valId, value) {
-    const bar = document.getElementById(barId);
-    const val = document.getElementById(valId);
-    if (bar) bar.style.width = `${value}%`;
-    if (val) val.textContent = `${value} / 100`;
   }
 
   startTickLoop() {

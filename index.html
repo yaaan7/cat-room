@@ -3,192 +3,114 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cat Room - 🐾 레트로 다마고치 고양이 육성 웹 게임</title>
-  <meta name="description" content="레트로 다마고치 내에서 귀여운 고양이를 돌보고 방을 꾸미는 웹 기반 육성 게임 & Arduino 피지컬 연동 샌드박스">
+  <title>Cat Room ♥ 🐾 레트로 픽셀 다마고치 고양이 육성</title>
+  <meta name="description" content="레트로 픽셀 다마고치 내에서 귀여운 고양이를 돌보고 방을 꾸미는 웹 기반 육성 게임 & Arduino 연동 샌드박스">
   <link rel="stylesheet" href="index.css">
 </head>
 <body>
 
+  <!-- Floating Pixel Background Decorations -->
+  <div class="pixel-decorations">
+    <div class="decor-cloud decor-cloud-1">☁️</div>
+    <div class="decor-cloud decor-cloud-2">☁️</div>
+    <div class="decor-star decor-star-1">✦</div>
+    <div class="decor-star decor-star-2">♥</div>
+    <div class="decor-star decor-star-3">✦</div>
+    <div class="decor-star decor-star-4">★</div>
+  </div>
+
   <!-- Header Bar -->
   <header class="app-header">
     <div class="brand-container">
-      <span class="brand-logo">🐾</span>
-      <h1 class="brand-title">Cat Room</h1>
-      <button id="catNameBadge" class="cat-name-badge" title="고양이 이름 수정">🐱 나비</button>
+      <span class="brand-logo">🐱</span>
+      <h1 class="brand-title">Cat Room ♥</h1>
+      <button id="catNameBadge" class="cat-name-badge" style="background:#fff0f5; border:1.5px solid #ffb7c5; color:#d81b60; font-weight:700; border-radius:20px; padding:4px 12px; cursor:pointer;" title="고양이 이름 수정">나비</button>
     </div>
     
     <div class="header-actions">
-      <button id="btnSerialConnect" class="serial-status-btn" title="Arduino Web Serial 연동">
+      <div class="star-counter-badge">
+        <span>⭐</span>
+        <span>120</span>
+      </div>
+
+      <button id="btnSerialConnect" class="icon-btn" title="Arduino Web Serial 연동">
         <span id="serialStatusDot" class="status-dot disconnected"></span>
-        <span id="serialStatusText">Arduino 연결</span>
       </button>
-      <button id="btnResetData" class="icon-btn" title="데이터 초기화">🔄</button>
+
+      <button id="btnOpenDecoration" class="icon-btn" title="방 꾸미기 슬롯">🛋️</button>
+      <button id="btnCaptureRoom" class="icon-btn" title="포토 카드 캡처">📸</button>
+      <button id="btnResetData" class="icon-btn" title="설정 & 데이터 초기화">⚙️</button>
     </div>
   </header>
 
-  <!-- Main Application Container -->
+  <!-- Main Application Workspace Container -->
   <main class="app-container">
     
-    <!-- Tamagotchi Shell Centerpiece -->
-    <section class="tamagotchi-shell-card">
-      <div class="tamagotchi-device">
-        <div class="tamagotchi-ring-hook"></div>
-        <div class="tamagotchi-brand-text">TAMAGOTCHI CAT</div>
+    <!-- Central Glitter Pink Tamagotchi Device Shell -->
+    <section class="tamagotchi-device-card">
+      <div class="tamagotchi-shell">
+        <div class="tamagotchi-heart-hook"></div>
+        <div class="tamagotchi-title-text">✨ Cat Room ✨</div>
 
-        <!-- Retro LCD Screen Frame -->
+        <!-- LCD Screen Frame -->
         <div class="tamagotchi-screen-frame">
-          <div class="lcd-status-bar">
-            <div class="lcd-icon-item" title="배고픔">🐟 <span id="lcdValHunger">30</span></div>
-            <div class="lcd-icon-item" title="행복도">💕 <span id="lcdValHappiness">70</span></div>
-            <div class="lcd-icon-item" title="에너지">⚡ <span id="lcdValEnergy">80</span></div>
-            <div class="lcd-icon-item" title="스트레스">💢 <span id="lcdValStress">10</span></div>
-          </div>
-
           <div id="speechBubble" class="speech-bubble-overlay">
             <span id="speechBubbleText">반가워요! 당신의 관심이 필요해요.</span>
           </div>
 
           <div id="roomCanvasContainer" class="room-stage-container">
-            <!-- SVG Canvas Injected by JS -->
+            <!-- Room SVG & Pixel Cat Injected by JS -->
           </div>
         </div>
 
-        <!-- Physical Tamagotchi Shell Buttons -->
-        <div class="tamagotchi-buttons-row">
-          <button id="btnTamagotchiA" class="tamagotchi-physical-btn" title="A: 밥 주기">
-            <span style="font-size:16px;">🐟</span>
-            <span class="btn-label">A</span>
-          </button>
-
-          <button id="btnTamagotchiB" class="tamagotchi-physical-btn" title="B: 쓰다듬기">
-            <span style="font-size:16px;">🖐️</span>
-            <span class="btn-label">B</span>
-          </button>
-
-          <button id="btnTamagotchiC" class="tamagotchi-physical-btn" title="C: 놀아주기">
-            <span style="font-size:16px;">🧶</span>
-            <span class="btn-label">C</span>
-          </button>
+        <!-- 3 Pearl Buttons on Shell Bottom -->
+        <div class="tamagotchi-pearl-buttons">
+          <button id="btnTamagotchiA" class="pearl-btn" title="A: 선택 / 밥주기"></button>
+          <button id="btnTamagotchiB" class="pearl-btn" title="B: 실행 / 쓰다듬기"></button>
+          <button id="btnTamagotchiC" class="pearl-btn" title="C: 메뉴 / 놀아주기"></button>
         </div>
       </div>
     </section>
 
-    <!-- Sidebar: Cat State Metrics HUD -->
-    <aside class="hud-metrics-card">
-      <div class="card-title">
-        <span>고양이 상태</span>
-        <span id="catBehaviorTag" class="cat-behavior-tag">💬 평온함</span>
-      </div>
+    <!-- Bottom 4 Pastel Pill Care Buttons (Exact Mockup Match) -->
+    <section class="pastel-care-pills-row">
+      <button id="btnCareFeed" class="care-pill-btn feed">
+        <span>🍽️</span>
+        <span>Feed</span>
+      </button>
 
-      <div class="metrics-list">
-        <div class="metric-item">
-          <div class="metric-header">
-            <span>🐟 배고픔</span>
-            <span id="valHunger">30 / 100</span>
-          </div>
-          <div class="metric-bar-bg">
-            <div id="barHunger" class="metric-bar-fill hunger" style="width: 30%;"></div>
-          </div>
-        </div>
+      <button id="btnCarePet" class="care-pill-btn pet">
+        <span>🖐️</span>
+        <span>Pet</span>
+      </button>
 
-        <div class="metric-item">
-          <div class="metric-header">
-            <span>💕 행복도</span>
-            <span id="valHappiness">70 / 100</span>
-          </div>
-          <div class="metric-bar-bg">
-            <div id="barHappiness" class="metric-bar-fill happiness" style="width: 70%;"></div>
-          </div>
-        </div>
+      <button id="btnCarePlay" class="care-pill-btn play">
+        <span>🏀</span>
+        <span>Play</span>
+      </button>
 
-        <div class="metric-item">
-          <div class="metric-header">
-            <span>✨ 친밀도</span>
-            <span id="valAffection">20 / 100</span>
-          </div>
-          <div class="metric-bar-bg">
-            <div id="barAffection" class="metric-bar-fill affection" style="width: 20%;"></div>
-          </div>
-        </div>
-
-        <div class="metric-item">
-          <div class="metric-header">
-            <span>⚡ 에너지</span>
-            <span id="valEnergy">80 / 100</span>
-          </div>
-          <div class="metric-bar-bg">
-            <div id="barEnergy" class="metric-bar-fill energy" style="width: 80%;"></div>
-          </div>
-        </div>
-
-        <div class="metric-item">
-          <div class="metric-header">
-            <span>💢 스트레스</span>
-            <span id="valStress">10 / 100</span>
-          </div>
-          <div class="metric-bar-bg">
-            <div id="barStress" class="metric-bar-fill stress" style="width: 10%;"></div>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Care Control Panel -->
-    <section class="care-actions-card">
-      <div class="care-buttons-group">
-        <button id="btnCareFeed" class="care-btn">
-          <span class="btn-icon">🐟</span>
-          <span>밥 주기</span>
-          <span class="action-shortcut">단축키 1 / A</span>
-        </button>
-
-        <button id="btnCarePet" class="care-btn">
-          <span class="btn-icon">🖐️</span>
-          <span>쓰다듬기</span>
-          <span class="action-shortcut">단축키 2 / B</span>
-        </button>
-
-        <button id="btnCarePlay" class="care-btn">
-          <span class="btn-icon">🧶</span>
-          <span>놀아주기</span>
-          <span class="action-shortcut">단축키 3 / C</span>
-        </button>
-
-        <button id="btnCareSleep" class="care-btn">
-          <span class="btn-icon">🌙</span>
-          <span>재우기</span>
-          <span class="action-shortcut">단축키 4</span>
-        </button>
-      </div>
-
-      <div class="secondary-actions-group">
-        <button id="btnOpenDecoration" class="secondary-btn outline">
-          <span>🛋️ 방 꾸미기</span>
-        </button>
-
-        <button id="btnCaptureRoom" class="secondary-btn">
-          <span>📸 방 캡처</span>
-        </button>
-      </div>
+      <button id="btnCareSleep" class="care-pill-btn sleep">
+        <span>🌙</span>
+        <span>Sleep</span>
+      </button>
     </section>
 
-    <!-- Virtual Sensor Debug Panel -->
-    <section class="virtual-sensor-card">
-      <div class="virtual-header">
-        <div class="virtual-title">
-          <span>🧪 가상 센서 테스트 패널 (하드웨어 미연결 테스트용)</span>
+    <!-- Extra Tool Card: Virtual Sensor Test Panel -->
+    <section class="extra-tools-section">
+      <div class="tool-card">
+        <div class="tool-header">
+          <span>🧪 가상 센서 테스트 패널 (아두이노 미연결 시연용)</span>
         </div>
-      </div>
-
-      <div class="virtual-buttons-grid">
-        <button id="vbtnSlowApproach" class="virtual-btn">🚶 천천히 접근</button>
-        <button id="vbtnFastApproach" class="virtual-btn">🏃 갑자기 접근</button>
-        <button id="vbtnPersonLeft" class="virtual-btn">👋 사용자 떠남</button>
-        <button id="vbtnPetShort" class="virtual-btn">🖐️ 짧게 쓰다듬기</button>
-        <button id="vbtnPetLong" class="virtual-btn">🖐️ 오래 쓰다듬기</button>
-        <button id="vbtnFeed" class="virtual-btn">🐟 밥 주기</button>
-        <button id="vbtnLightBright" class="virtual-btn">☀️ 방 밝게 하기</button>
-        <button id="vbtnLightDark" class="virtual-btn">🌙 방 어둡게 하기</button>
+        <div class="virtual-buttons-grid">
+          <button id="vbtnSlowApproach" class="virtual-btn">🚶 천천히 접근</button>
+          <button id="vbtnFastApproach" class="virtual-btn">🏃 갑자기 접근</button>
+          <button id="vbtnPersonLeft" class="virtual-btn">👋 사용자 떠남</button>
+          <button id="vbtnPetShort" class="virtual-btn">🖐️ 짧게 쓰다듬기</button>
+          <button id="vbtnPetLong" class="virtual-btn">🖐️ 오래 쓰다듬기</button>
+          <button id="vbtnFeed" class="virtual-btn">🍽️ 밥 주기</button>
+          <button id="vbtnLightBright" class="virtual-btn">☀️ 방 밝게 하기</button>
+          <button id="vbtnLightDark" class="virtual-btn">🌙 방 어둡게 하기</button>
+        </div>
       </div>
     </section>
 
@@ -197,7 +119,7 @@
   <!-- Room Decoration Drawer Modal -->
   <div id="drawerBackdrop" class="drawer-backdrop">
     <div class="drawer-content">
-      <div class="drawer-header">
+      <div class="drawer-header" style="display:flex; justify-content:space-between; align-items:center;">
         <h2>🛋️ 방 꾸미기 슬롯</h2>
         <button id="btnCloseDrawer" class="icon-btn">✕</button>
       </div>
@@ -218,7 +140,7 @@
       <h2>🐱 고양이의 이름을 정해 주세요!</h2>
       <p style="color:var(--text-muted); font-size:14px;">다마고치에 찾아온 귀여운 고양이에게 특별한 이름을 선물하세요.</p>
       <input type="text" id="inputCatName" class="form-input" placeholder="고양이 이름 (예: 나비)" maxlength="12">
-      <button id="btnSaveCatName" class="secondary-btn" style="width:100%; justify-content:center;">입력 완료</button>
+      <button id="btnSaveCatName" class="care-pill-btn feed" style="width:100%; margin-top:8px;">입력 완료</button>
     </div>
   </div>
 

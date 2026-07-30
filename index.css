@@ -1,48 +1,34 @@
-/* Cat Room - Main CSS System Design & Tamagotchi Shell Theme */
+/* Cat Room - Tamagotchi Pixel-Art Theme (Exact Mockup Match) */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Press+Start+2P&family=Noto+Sans+KR:wght@400;500;700&display=swap');
 
 :root {
-  /* Color Palette Tokens */
-  --bg-main: #0f111a;
-  --bg-card: rgba(26, 30, 46, 0.85);
-  --bg-card-border: rgba(255, 255, 255, 0.12);
+  /* Colors inspired by Mockup */
+  --bg-page: #fef8e7;
+  --header-bg: #fffdf0;
   
-  /* Tamagotchi Shell Colors */
-  --tamagotchi-shell-bg: linear-gradient(145deg, #ff9ebb 0%, #ff7597 45%, #e056fd 100%);
-  --tamagotchi-shell-border: #f3a683;
-  --tamagotchi-lcd-bg: #81ecec;
-  --tamagotchi-lcd-frame: #2d3436;
+  /* Tamagotchi Glitter Pink Shell */
+  --shell-gradient: linear-gradient(145deg, #ff9ebb 0%, #ff70a6 50%, #f78fb3 100%);
+  --shell-rim: #ffffff;
+  --shell-shadow: rgba(255, 112, 166, 0.4);
   
-  --primary-accent: #ff7597;
-  --primary-gradient: linear-gradient(135deg, #ff7597 0%, #ff9ebb 100%);
-  --secondary-accent: #70a1ff;
-  --success-color: #2ed573;
-  --warning-color: #ffa502;
-  --danger-color: #ff4757;
-  
-  /* Text Colors */
-  --text-main: #f1f2f6;
-  --text-muted: #a4b0be;
-  --text-highlight: #ffffff;
-  
-  /* Metric Colors */
-  --metric-hunger: #ff6b81;
-  --metric-happiness: #ffbe76;
-  --metric-affection: #ff79ac;
-  --metric-energy: #70a1ff;
-  --metric-stress: #a55eea;
+  /* Bottom Care Pill Button Colors */
+  --btn-feed-bg: #ffebee;
+  --btn-feed-color: #d81b60;
+  --btn-pet-bg: #fff8e1;
+  --btn-pet-color: #f57f17;
+  --btn-play-bg: #e8f5e9;
+  --btn-play-color: #2e7d32;
+  --btn-sleep-bg: #f3e5f5;
+  --btn-sleep-color: #6a1b9a;
 
-  /* Dimensions & Spacing */
-  --radius-lg: 24px;
-  --radius-md: 14px;
-  --radius-sm: 8px;
-  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.45);
-  --shadow-glow: 0 0 30px rgba(255, 117, 151, 0.4);
-  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --text-dark: #4a4a4a;
+  --text-muted: #888888;
+  --primary-pink: #ff70a6;
+
+  --radius-pill: 30px;
+  --radius-card: 24px;
 }
 
-/* Reset & Base Setup */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -50,31 +36,64 @@
 }
 
 body {
-  font-family: 'Outfit', 'Noto Sans KR', -apple-system, sans-serif;
-  background-color: var(--bg-main);
-  background-image: 
-    radial-gradient(at 15% 15%, rgba(255, 117, 151, 0.2) 0px, transparent 55%),
-    radial-gradient(at 85% 85%, rgba(112, 161, 255, 0.2) 0px, transparent 55%);
-  color: var(--text-main);
+  font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+  background-color: var(--bg-page);
+  color: var(--text-dark);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
   overflow-x: hidden;
+
+  /* Floating Decorative Pixel Background Pattern */
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(255, 112, 166, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(255, 230, 0, 0.08) 0%, transparent 40%);
 }
 
-/* Top Navigation Header */
+/* Decorative Pixel Sparkles / Clouds background */
+.pixel-decorations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.decor-cloud {
+  position: absolute;
+  opacity: 0.6;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
+}
+.decor-cloud-1 { top: 18%; left: 8%; font-size: 42px; }
+.decor-cloud-2 { top: 22%; right: 10%; font-size: 38px; }
+
+.decor-star {
+  position: absolute;
+  font-size: 20px;
+  opacity: 0.7;
+  animation: floatSparkle 3s infinite ease-in-out;
+}
+.decor-star-1 { top: 15%; left: 22%; color: #ffe066; }
+.decor-star-2 { top: 40%; left: 6%; color: #ff7597; }
+.decor-star-3 { top: 35%; right: 8%; color: #a55eea; }
+.decor-star-4 { top: 60%; right: 18%; color: #70a1ff; }
+
+@keyframes floatSparkle {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.15); }
+}
+
+/* Header Bar */
 .app-header {
   height: 64px;
-  padding: 0 24px;
+  padding: 0 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(15, 17, 26, 0.9);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--bg-card-border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  background: var(--header-bg);
+  border-bottom: 1px solid #f0e6d2;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+  z-index: 10;
 }
 
 .brand-container {
@@ -84,204 +103,134 @@ body {
 }
 
 .brand-logo {
-  font-size: 26px;
-  filter: drop-shadow(0 2px 10px rgba(255, 117, 151, 0.6));
+  font-size: 24px;
+  color: var(--primary-pink);
 }
 
 .brand-title {
-  font-size: 22px;
-  font-weight: 700;
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-family: 'Press Start 2P', cursive, sans-serif;
+  font-size: 16px;
+  color: var(--primary-pink);
   letter-spacing: -0.5px;
 }
 
-.cat-name-badge {
-  background: rgba(255, 117, 151, 0.15);
-  border: 1px solid rgba(255, 117, 151, 0.3);
-  color: var(--primary-accent);
-  padding: 4px 14px;
+.star-counter-badge {
+  background: #fff8e1;
+  border: 1.5px solid #ffe082;
+  color: #f57f17;
+  padding: 5px 14px;
   border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition-fast);
-}
-
-.cat-name-badge:hover {
-  background: rgba(255, 117, 151, 0.3);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
-}
-
-.serial-status-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--bg-card-border);
-  color: var(--text-main);
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: var(--transition-fast);
-}
-
-.serial-status-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--text-muted);
-}
-
-.status-dot.connected {
-  background-color: var(--success-color);
-  box-shadow: 0 0 10px var(--success-color);
-}
-
-.status-dot.disconnected {
-  background-color: var(--danger-color);
+  gap: 12px;
 }
 
 .icon-btn {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--bg-card-border);
-  color: var(--text-main);
-  width: 36px;
-  height: 36px;
+  background: #fff;
+  border: 1px solid #f0e6d2;
+  color: var(--text-dark);
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: var(--transition-fast);
-  font-size: 16px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
 
 .icon-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: #fff0f5;
   transform: translateY(-2px);
 }
 
-/* Main Workspace Layout */
+/* Main Layout Centered around Tamagotchi */
 .app-container {
   flex: 1;
-  max-width: 1280px;
+  max-width: 1100px;
   width: 100%;
   margin: 0 auto;
   padding: 24px 20px;
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  grid-template-rows: auto auto auto;
-  gap: 24px;
-}
-
-/* ==========================================================================
-   Tamagotchi Device Centerpiece Component
-   ========================================================================== */
-.tamagotchi-shell-card {
-  grid-column: 1 / 2;
-  grid-row: 1 / 2;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  position: relative;
+  gap: 28px;
+  z-index: 1;
 }
 
 /* Tamagotchi Outer Egg Device Body */
-.tamagotchi-device {
-  width: 100%;
-  max-width: 580px;
-  background: var(--tamagotchi-shell-bg);
-  border: 8px solid #ffffff;
-  border-radius: 200px 200px 180px 180px;
-  padding: 32px 36px 40px 36px;
-  box-shadow: 
-    0 24px 48px rgba(0, 0, 0, 0.5),
-    inset 0 -12px 24px rgba(0, 0, 0, 0.25),
-    inset 0 12px 24px rgba(255, 255, 255, 0.4);
+.tamagotchi-device-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
 }
 
-/* Lanyard Ring Hook on Top of Device */
-.tamagotchi-ring-hook {
+.tamagotchi-shell {
+  width: 440px;
+  background: var(--shell-gradient);
+  border: 8px solid #ffffff;
+  border-radius: 220px 220px 200px 200px;
+  padding: 28px 32px 36px 32px;
+  box-shadow: 
+    0 24px 50px var(--shell-shadow),
+    inset 0 -10px 20px rgba(0, 0, 0, 0.15),
+    inset 0 10px 20px rgba(255, 255, 255, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+/* Heart Lanyard Hook on Top */
+.tamagotchi-heart-hook {
   position: absolute;
-  top: -24px;
-  width: 48px;
-  height: 48px;
-  border: 7px solid #ffffff;
-  border-radius: 50%;
-  background: transparent;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  top: -22px;
+  width: 44px;
+  height: 44px;
+  background: #ffffff;
+  clip-path: path("M 22 40 C 22 40 4 26 4 14 C 4 6 11 0 19 0 C 24 0 28 3 30 7 C 32 3 36 0 41 0 C 49 0 56 6 56 14 C 56 26 38 40 38 40 Z");
+  transform: scale(0.75);
 }
 
-/* Device Header Branding */
-.tamagotchi-brand-text {
+/* Device Screen Header Title */
+.tamagotchi-title-text {
   font-family: 'Press Start 2P', cursive, sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.4);
-  letter-spacing: 2px;
-  margin-bottom: 16px;
-  text-transform: uppercase;
+  text-shadow: 0 2px 4px rgba(216, 27, 96, 0.5);
+  letter-spacing: 1px;
+  margin-bottom: 14px;
 }
 
-/* Retro Inner LCD Screen Frame */
+/* Spacious LCD Screen Frame */
 .tamagotchi-screen-frame {
   width: 100%;
-  background: #1e272e;
-  border: 6px solid #d2dae2;
-  border-radius: 28px;
-  padding: 12px;
-  box-shadow: inset 0 6px 14px rgba(0, 0, 0, 0.6);
+  background: #ffffff;
+  border: 6px solid #f8bbd0;
+  border-radius: 24px;
+  padding: 8px;
+  box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.08);
   position: relative;
   overflow: hidden;
-}
-
-/* Status Icon Bar at Top of LCD Screen */
-.lcd-status-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 6px 12px;
-  border-radius: 14px;
-  margin-bottom: 8px;
-}
-
-.lcd-icon-item {
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 600;
 }
 
 .room-stage-container {
   width: 100%;
-  height: 380px;
-  background: #f8bbd0;
-  border-radius: 18px;
+  height: 330px;
+  background: #fff5f5;
+  border-radius: 16px;
   position: relative;
   overflow: hidden;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.15);
 }
 
 #roomSvgCanvas {
@@ -290,258 +239,134 @@ body {
   display: block;
 }
 
-/* Speech Dialogue Overlay inside Tamagotchi Screen */
+/* Speech Dialogue Overlay inside LCD Screen */
 .speech-bubble-overlay {
   position: absolute;
-  top: 14px;
+  top: 38px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(15, 17, 26, 0.92);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 117, 151, 0.4);
-  padding: 10px 18px;
-  border-radius: 20px;
-  color: var(--text-main);
-  font-size: 14px;
-  font-weight: 500;
-  max-width: 85%;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.5px solid var(--primary-pink);
+  padding: 8px 16px;
+  border-radius: 18px;
+  color: #333333;
+  font-size: 13px;
+  font-weight: 600;
+  max-width: 88%;
   text-align: center;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   z-index: 10;
 }
 
-/* Physical Tamagotchi Buttons on Shell Bottom */
-.tamagotchi-buttons-row {
+/* 3 Pearl Buttons on Tamagotchi Shell Bottom */
+.tamagotchi-pearl-buttons {
   display: flex;
   justify-content: center;
-  gap: 40px;
-  margin-top: 24px;
-  width: 100%;
+  gap: 32px;
+  margin-top: 22px;
 }
 
-.tamagotchi-physical-btn {
-  width: 56px;
-  height: 56px;
+.pearl-btn {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: linear-gradient(145deg, #ffffff, #d2dae2);
-  border: 3px solid #808e9b;
-  box-shadow: 
-    0 6px 12px rgba(0, 0, 0, 0.3),
-    inset 0 -3px 6px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(145deg, #ffffff, #ffe0ec);
+  border: 2px solid #ffb7c5;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   transition: all 0.15s ease;
 }
 
-.tamagotchi-physical-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+.pearl-btn:hover {
+  transform: scale(1.08);
 }
 
-.tamagotchi-physical-btn:active {
-  transform: translateY(2px);
-  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.4);
+.pearl-btn:active {
+  transform: scale(0.95);
 }
 
-.btn-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: #485460;
-  margin-top: 2px;
-}
-
-/* HUD Metrics Sidebar Card */
-.hud-metrics-card {
-  grid-column: 2 / 3;
-  grid-row: 1 / 2;
-  background: var(--bg-card);
-  border: 1px solid var(--bg-card-border);
-  border-radius: var(--radius-lg);
-  padding: 20px;
+/* Bottom 4 Pastel Pill Care Control Buttons */
+.pastel-care-pills-row {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   gap: 16px;
-  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 680px;
 }
 
-.card-title {
+.care-pill-btn {
+  flex: 1;
+  padding: 14px 20px;
+  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   font-size: 16px;
   font-weight: 700;
-  color: var(--text-main);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.cat-behavior-tag {
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-weight: 600;
-  background: rgba(112, 161, 255, 0.15);
-  color: var(--secondary-accent);
+.care-pill-btn.feed {
+  background: var(--btn-feed-bg);
+  color: var(--btn-feed-color);
+  border-color: #ffcdd2;
 }
 
-.metrics-list {
+.care-pill-btn.pet {
+  background: var(--btn-pet-bg);
+  color: var(--btn-pet-color);
+  border-color: #ffe082;
+}
+
+.care-pill-btn.play {
+  background: var(--btn-play-bg);
+  color: var(--btn-play-color);
+  border-color: #c8e6c9;
+}
+
+.care-pill-btn.sleep {
+  background: var(--btn-sleep-bg);
+  color: var(--btn-sleep-color);
+  border-color: #e1bee7;
+}
+
+.care-pill-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.care-pill-btn:active {
+  transform: translateY(0);
+}
+
+/* Extra Tools Section (Virtual Sensor, Room Deco, Serial) */
+.extra-tools-section {
+  width: 100%;
+  max-width: 680px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-}
-
-.metric-item {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.metric-header {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.metric-bar-bg {
-  height: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 5px;
-  overflow: hidden;
-  position: relative;
-}
-
-.metric-bar-fill {
-  height: 100%;
-  border-radius: 5px;
-  transition: width var(--transition-normal);
-}
-
-.metric-bar-fill.hunger { background: var(--metric-hunger); }
-.metric-bar-fill.happiness { background: var(--metric-happiness); }
-.metric-bar-fill.affection { background: var(--metric-affection); }
-.metric-bar-fill.energy { background: var(--metric-energy); }
-.metric-bar-fill.stress { background: var(--metric-stress); }
-
-/* Care Control Panel */
-.care-actions-card {
-  grid-column: 1 / 2;
-  grid-row: 2 / 3;
-  background: var(--bg-card);
-  border: 1px solid var(--bg-card-border);
-  border-radius: var(--radius-lg);
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: 16px;
-  box-shadow: var(--shadow-lg);
 }
 
-.care-buttons-group {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  flex: 1;
-}
-
-.care-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--bg-card-border);
-  border-radius: var(--radius-md);
-  padding: 14px 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-main);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition-fast);
-}
-
-.care-btn .btn-icon {
-  font-size: 24px;
-}
-
-.care-btn:hover {
-  background: rgba(255, 117, 151, 0.15);
-  border-color: var(--primary-accent);
-  transform: translateY(-2px);
-}
-
-.action-shortcut {
-  font-size: 10px;
-  opacity: 0.6;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.secondary-actions-group {
-  display: flex;
-  gap: 12px;
-}
-
-.secondary-btn {
-  background: var(--primary-gradient);
-  border: none;
-  color: #fff;
-  padding: 12px 20px;
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 4px 14px rgba(255, 117, 151, 0.4);
-  transition: var(--transition-fast);
-}
-
-.secondary-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 117, 151, 0.6);
-}
-
-.secondary-btn.outline {
-  background: transparent;
-  border: 1px solid var(--bg-card-border);
-  box-shadow: none;
-}
-
-.secondary-btn.outline:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* Virtual Sensor Control Panel */
-.virtual-sensor-card {
-  grid-column: 1 / -1;
-  grid-row: 3 / 4;
-  background: rgba(25, 29, 44, 0.8);
-  border: 1px dashed rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-lg);
+.tool-card {
+  background: #ffffff;
+  border: 1px solid #f0e6d2;
+  border-radius: var(--radius-card);
   padding: 16px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
 }
 
-.virtual-header {
+.tool-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.virtual-title {
+  margin-bottom: 12px;
+  font-weight: 700;
   font-size: 14px;
-  font-weight: 600;
-  color: var(--secondary-accent);
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .virtual-buttons-grid {
@@ -551,139 +376,29 @@ body {
 }
 
 .virtual-btn {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--text-muted);
+  background: #fdfbf7;
+  border: 1px solid #eee5d8;
+  color: var(--text-dark);
   padding: 8px 10px;
-  border-radius: var(--radius-sm);
+  border-radius: 12px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: var(--transition-fast);
+  transition: all 0.2s ease;
   text-align: center;
 }
 
 .virtual-btn:hover {
-  background: rgba(112, 161, 255, 0.15);
-  color: var(--text-main);
-  border-color: var(--secondary-accent);
+  background: #fff0f5;
+  border-color: var(--primary-pink);
 }
 
-/* Drawer & Modals */
-.drawer-backdrop {
+/* Modals & Drawer */
+.drawer-backdrop, .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(6px);
-  z-index: 200;
-  display: flex;
-  justify-content: flex-end;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.drawer-backdrop.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.drawer-content {
-  width: 420px;
-  height: 100%;
-  background: #191c2b;
-  border-left: 1px solid var(--bg-card-border);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  transform: translateX(100%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow-y: auto;
-}
-
-.drawer-backdrop.active .drawer-content {
-  transform: translateX(0);
-}
-
-.drawer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.slot-tabs {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-}
-
-.slot-tab-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--bg-card-border);
-  color: var(--text-muted);
-  padding: 6px 12px;
-  border-radius: 16px;
-  font-size: 12px;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.slot-tab-btn.active {
-  background: var(--primary-accent);
-  color: #fff;
-  border-color: var(--primary-accent);
-}
-
-.items-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.item-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--bg-card-border);
-  border-radius: var(--radius-md);
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  position: relative;
-  transition: var(--transition-fast);
-}
-
-.item-card:hover {
-  background: rgba(255, 117, 151, 0.1);
-  border-color: var(--primary-accent);
-}
-
-.item-card.equipped {
-  border-color: var(--success-color);
-  box-shadow: 0 0 12px rgba(46, 213, 115, 0.2);
-}
-
-.item-card.locked {
-  opacity: 0.5;
-  filter: grayscale(0.8);
-  cursor: not-allowed;
-}
-
-.lock-badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  font-size: 12px;
-}
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
   z-index: 300;
   display: flex;
   align-items: center;
@@ -693,54 +408,82 @@ body {
   transition: opacity 0.3s ease;
 }
 
-.modal-backdrop.active {
+.drawer-backdrop.active, .modal-backdrop.active {
   opacity: 1;
   pointer-events: auto;
 }
 
-.modal-box {
-  background: #1e2235;
-  border: 1px solid var(--bg-card-border);
-  border-radius: var(--radius-lg);
-  width: 90%;
-  max-width: 480px;
-  padding: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  box-shadow: var(--shadow-lg);
-}
-
-#toastContainer {
+.drawer-content {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 400px;
+  background: #ffffff;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  z-index: 400;
+  gap: 18px;
+  box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 301;
 }
 
-.toast-message {
-  background: rgba(30, 35, 51, 0.95);
-  backdrop-filter: blur(10px);
-  border-left: 4px solid var(--primary-accent);
-  padding: 12px 20px;
-  border-radius: 8px;
-  color: var(--text-main);
-  font-size: 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  animation: slideIn 0.3s ease forwards;
+.drawer-backdrop.active .drawer-content {
+  transform: translateX(0);
 }
 
-@keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  overflow-y: auto;
 }
 
+.item-card {
+  background: #fef8e7;
+  border: 1.5px solid #f0e6d2;
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.item-card.equipped {
+  border-color: #2ed573;
+  background: #e8f5e9;
+}
+
+.modal-box {
+  background: #ffffff;
+  border-radius: var(--radius-card);
+  padding: 28px;
+  width: 90%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid #f0e6d2;
+  border-radius: 12px;
+  font-size: 15px;
+  outline: none;
+}
+
+/* Animations */
 @keyframes catPurr {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+  50% { transform: translateY(-4px); }
 }
 
 @keyframes catSleep {
@@ -750,23 +493,10 @@ body {
 
 @keyframes catShake {
   0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-7px); }
-  40%, 80% { transform: translateX(7px); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
 }
 
 .anim-purr { animation: catPurr 2s infinite ease-in-out; }
-.anim-sleep { animation: catSleep 3s infinite ease-in-out; }
+.anim-sleep { animation: catSleep 2.5s infinite ease-in-out; }
 .anim-shake { animation: catShake 0.4s ease; }
-
-@media (max-width: 900px) {
-  .app-container {
-    grid-template-columns: 1fr;
-  }
-  .hud-metrics-card {
-    grid-column: 1 / 2;
-    grid-row: auto;
-  }
-  .care-buttons-group {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
