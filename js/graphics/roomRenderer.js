@@ -1,6 +1,6 @@
 /**
  * Cat Room - SVG Room Renderer
- * Renders cozy room elements inside the LCD screen frame.
+ * Renders cozy room elements inside the enlarged LCD screen frame.
  */
 
 export class RoomRenderer {
@@ -18,64 +18,64 @@ export class RoomRenderer {
     if (fl === 'fl_tile') flFill = "#ffffff";
 
     return `
-      <svg id="mainRoomSvg" viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; display:block;">
+      <svg id="mainRoomSvg" viewBox="0 0 380 300" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; display:block;">
         <!-- Room Wallpaper Wall -->
-        <rect x="0" y="0" width="320" height="175" fill="${wpFill}" />
+        <rect x="0" y="0" width="380" height="200" fill="${wpFill}" />
         
         <!-- Wallpaper Wall Stripes Pattern -->
-        <line x1="0" y1="35" x2="320" y2="35" stroke="rgba(255,117,151,0.08)" stroke-width="2" />
-        <line x1="0" y1="85" x2="320" y2="85" stroke="rgba(255,117,151,0.08)" stroke-width="2" />
-        <line x1="0" y1="135" x2="320" y2="135" stroke="rgba(255,117,151,0.08)" stroke-width="2" />
+        <line x1="0" y1="40" x2="380" y2="40" stroke="rgba(255,117,151,0.08)" stroke-width="2" />
+        <line x1="0" y1="95" x2="380" y2="95" stroke="rgba(255,117,151,0.08)" stroke-width="2" />
+        <line x1="0" y1="150" x2="380" y2="150" stroke="rgba(255,117,151,0.08)" stroke-width="2" />
 
         <!-- Checkered Cozy Floor -->
-        <polygon points="0,175 320,175 320,260 0,260" fill="${flFill}" />
+        <polygon points="0,200 380,200 380,300 0,300" fill="${flFill}" />
         <!-- Floor Checkers -->
-        <path d="M 0 175 L 320 175 M 0 195 L 320 195 M 0 220 L 320 220 M 0 245 L 320 245" stroke="#f57c00" opacity="0.15" stroke-width="2" />
-        <path d="M 50 175 L 15 260 M 100 175 L 75 260 M 160 175 L 150 260 M 220 175 L 230 260 M 270 175 L 300 260" stroke="#f57c00" opacity="0.15" stroke-width="2" />
+        <path d="M 0 200 L 380 200 M 0 225 L 380 225 M 0 255 L 380 255 M 0 280 L 380 280" stroke="#f57c00" opacity="0.15" stroke-width="2" />
+        <path d="M 60 200 L 20 300 M 120 200 L 90 300 M 190 200 L 180 300 M 260 200 L 270 300 M 320 200 L 350 300" stroke="#f57c00" opacity="0.15" stroke-width="2" />
         
         <!-- Floor Baseboard -->
-        <line x1="0" y1="175" x2="320" y2="175" stroke="#d7ccc8" stroke-width="3" />
+        <line x1="0" y1="200" x2="380" y2="200" stroke="#d7ccc8" stroke-width="3" />
 
         <!-- Window with Pink Curtains -->
-        <g transform="translate(20, 35)">
-          <rect x="0" y="0" width="55" height="65" rx="6" fill="#81d4fa" stroke="#ffffff" stroke-width="3" />
-          <line x1="27.5" y1="0" x2="27.5" y2="65" stroke="#ffffff" stroke-width="2" />
-          <line x1="0" y1="32.5" x2="55" y2="32.5" stroke="#ffffff" stroke-width="2" />
+        <g transform="translate(25, 40)">
+          <rect x="0" y="0" width="60" height="70" rx="6" fill="#81d4fa" stroke="#ffffff" stroke-width="3" />
+          <line x1="30" y1="0" x2="30" y2="70" stroke="#ffffff" stroke-width="2" />
+          <line x1="0" y1="35" x2="60" y2="35" stroke="#ffffff" stroke-width="2" />
           <!-- Curtains -->
-          <path d="M -4 -4 L 14 -4 C 10 25 15 50 3 70 L -4 70 Z" fill="#ffb7c5" />
-          <path d="M 59 -4 L 41 -4 C 45 25 40 50 52 70 L 59 70 Z" fill="#ffb7c5" />
+          <path d="M -4 -4 L 15 -4 C 10 25 15 50 3 75 L -4 75 Z" fill="#ffb7c5" />
+          <path d="M 64 -4 L 45 -4 C 50 25 45 50 57 75 L 64 75 Z" fill="#ffb7c5" />
         </g>
 
         <!-- Wall Decor Picture Frame -->
-        <g transform="translate(235, 35)">
-          <rect x="0" y="0" width="50" height="40" rx="4" fill="#ffffff" stroke="#d7ccc8" stroke-width="3" />
-          <path d="M 25 12 Q 25 8 21 8 Q 17 8 17 12 Q 17 17 25 24 Q 33 17 33 12 Q 33 8 29 8 Q 25 8 25 12 Z" fill="#ff7597" />
+        <g transform="translate(280, 40)">
+          <rect x="0" y="0" width="55" height="45" rx="4" fill="#ffffff" stroke="#d7ccc8" stroke-width="3" />
+          <path d="M 27.5 15 Q 27.5 10 23 10 Q 18 10 18 15 Q 18 20 27.5 28 Q 37 20 37 15 Q 37 10 32 10 Q 27.5 10 27.5 15 Z" fill="#ff7597" />
         </g>
 
         <!-- Plant Item -->
-        <g transform="translate(20, 140)">
+        <g transform="translate(25, 160)">
           <path d="M 8 20 L 24 20 L 21 35 L 11 35 Z" fill="#b0bec5" />
           <circle cx="16" cy="14" r="8" fill="#81c784" />
           <circle cx="12" cy="9" r="6" fill="#a5d6a7" />
         </g>
 
         <!-- Bed Cushion Item -->
-        <g transform="translate(230, 150)">
-          <ellipse cx="32" cy="20" rx="30" ry="13" fill="#ffb7c5" stroke="#ff7597" stroke-width="2" />
-          <ellipse cx="32" cy="18" rx="22" ry="9" fill="#ffffff" />
+        <g transform="translate(275, 175)">
+          <ellipse cx="35" cy="22" rx="32" ry="14" fill="#ffb7c5" stroke="#ff7597" stroke-width="2" />
+          <ellipse cx="35" cy="20" rx="24" ry="10" fill="#ffffff" />
         </g>
 
         <!-- Bowl Item -->
-        <g transform="translate(190, 182)">
-          <ellipse cx="12" cy="8" rx="11" ry="6" fill="#90caf9" stroke="#42a5f5" stroke-width="1.5" />
-          <ellipse cx="12" cy="6" rx="8" ry="3.5" fill="#795548" />
+        <g transform="translate(225, 210)">
+          <ellipse cx="14" cy="9" rx="12" ry="7" fill="#90caf9" stroke="#42a5f5" stroke-width="1.5" />
+          <ellipse cx="14" cy="7" rx="9" ry="4" fill="#795548" />
         </g>
 
         <!-- Rug Mat Center -->
-        <ellipse cx="150" cy="195" rx="48" ry="16" fill="#f8bbd0" opacity="0.65" stroke="#ff7597" stroke-dasharray="3,3" stroke-width="1.5" />
+        <ellipse cx="180" cy="225" rx="55" ry="18" fill="#f8bbd0" opacity="0.65" stroke="#ff7597" stroke-dasharray="3,3" stroke-width="1.5" />
 
-        <!-- Cute Kitten Center Stage -->
-        <g transform="translate(85, 80)">
+        <!-- Pixel Cat Center Stage -->
+        <g transform="translate(125, 90)">
           ${catSvgContent}
         </g>
       </svg>

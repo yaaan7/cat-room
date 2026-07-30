@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cat Room ♥ 🐾 3D 다마고치 고양이 육성</title>
-  <meta name="description" content="3D 다마고치 내에서 귀여운 고양이를 돌보고 방을 꾸미는 웹 기반 육성 게임 & Arduino 연동 샌드박스">
+  <title>Cat Room ♥ 🐾 레트로 픽셀 다마고치 고양이 육성</title>
+  <meta name="description" content="레트로 픽셀 다마고치 내에서 귀여운 픽셀 고양이를 돌보고 방을 꾸미는 웹 게임 & Arduino 연동 샌드박스">
   <link rel="stylesheet" href="index.css">
 </head>
 <body>
@@ -37,37 +37,11 @@
     </div>
   </header>
 
-  <!-- 3-Column 100vh Dashboard Container -->
+  <!-- 100vh Dashboard Grid Layout -->
   <main class="dashboard-grid">
     
-    <!-- Left Sidebar: Action Control List & Virtual Sensor Debug List -->
+    <!-- Left Sidebar: Virtual Sensor Debug List (Redundant Care Panel Removed) -->
     <aside class="sidebar-panel">
-      <!-- Care Actions Card -->
-      <div class="panel-card">
-        <div class="panel-title">
-          <span>🎮 돌보기 행동</span>
-        </div>
-        <div class="care-list-vertical">
-          <button id="btnCareFeed" class="care-list-btn feed">
-            <span>🍽️</span>
-            <span>Feed (밥 주기)</span>
-          </button>
-          <button id="btnCarePet" class="care-list-btn pet">
-            <span>🖐️</span>
-            <span>Pet (쓰다듬기)</span>
-          </button>
-          <button id="btnCarePlay" class="care-list-btn play">
-            <span>🏀</span>
-            <span>Play (놀아주기)</span>
-          </button>
-          <button id="btnCareSleep" class="care-list-btn sleep">
-            <span>🌙</span>
-            <span>Sleep (재우기)</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Virtual Sensor Debug Panel -->
       <div class="panel-card">
         <div class="panel-title">
           <span>🧪 가상 센서 테스트</span>
@@ -85,7 +59,7 @@
       </div>
     </aside>
 
-    <!-- Center Stage: 3D Glossy Tamagotchi Device Shell -->
+    <!-- Center Stage: Spacious 3D Glossy Tamagotchi Shell -->
     <section class="center-tamagotchi-stage">
       <div class="tamagotchi-shell-3d">
         <div class="tamagotchi-heart-hook"></div>
@@ -98,7 +72,7 @@
           </div>
 
           <div id="roomCanvasContainer" class="room-stage-container">
-            <!-- Room SVG & Kitten Injected by JS -->
+            <!-- Room SVG & Pixel Cat Injected by JS -->
           </div>
         </div>
 
@@ -198,9 +172,9 @@
   <div id="modalOnboardingBackdrop" class="modal-backdrop">
     <div class="modal-box">
       <h2>🐱 고양이의 이름을 정해 주세요!</h2>
-      <p style="color:var(--text-muted); font-size:14px;">다마고치에 찾아온 귀여운 고양이에게 특별한 이름을 선물하세요.</p>
+      <p style="color:var(--text-muted); font-size:14px;">다마고치에 찾아온 귀여운 픽셀 고양이에게 특별한 이름을 선물하세요.</p>
       <input type="text" id="inputCatName" class="form-input" placeholder="고양이 이름 (예: 나비)" maxlength="12">
-      <button id="btnSaveCatName" class="care-list-btn feed" style="justify-content:center; margin-top:8px;">입력 완료</button>
+      <button id="btnSaveCatName" class="header-action-btn" style="justify-content:center; margin-top:8px; background:var(--primary-pink); color:#fff; border:none; padding:10px;">입력 완료</button>
     </div>
   </div>
 
