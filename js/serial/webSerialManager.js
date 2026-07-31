@@ -3,7 +3,7 @@
  *
  * Responsibilities:
  * - Handle Serial Port connection lifecycle and status callbacks
- * - Read incoming raw serial text line-by-line
+ * - Read incoming raw serial text line-by-line using standard TextDecoder
  * - Output debug log `console.log('[Serial Raw]', trimmed)`
  * - Parse JSON events (or fallback text format) and log `console.log('[Arduino Event]', event)`
  * - Forward events directly to GameEventDispatcher without modifying game state directly.
@@ -17,6 +17,7 @@ export class WebSerialManager {
     this.reader = null;
     this.isConnected = false;
     this.isConnecting = false;
+    this.textDecoder = new TextDecoder();
   }
 
   isSupported() {
@@ -43,7 +44,7 @@ export class WebSerialManager {
       this.isConnecting = false;
 
       if (this.statusCallback) this.statusCallback('CONNECTED', '페어링됨');
-      
+
       // Mark arduino connected flag in storage
       if (this.eventDispatcher && this.eventDispatcher.storageManager) {
         const data = this.eventDispatcher.storageManager.loadData();
@@ -61,7 +62,7 @@ export class WebSerialManager {
       console.error('Serial Connection Error:', err);
       this.isConnected = false;
       this.isConnecting = false;
-      if (this.statusCallback) this.statusCallback('DISCONNECTED', '연결 끊김');
+      if (this.statusCallback) this.statusCallback('DISCONNECTED', '연결 실패 또는 취소됨');
       return false;
     }
   }
@@ -71,13 +72,20 @@ export class WebSerialManager {
     this.isConnecting = false;
 
     if (this.reader) {
-      try { await this.reader.cancel(); }
-      catch (e) { console.warn('Reader cancel warning:', e); }
+      try {
+        await this.reader.cancel();
+      } catch (e) {
+        console.warn('Reader cancel warning:', e);
+      }
     }
     if (this.port) {
-      try { await this.port.close(); }
-      catch (e) { console.warn('Port close warning:', e); }
+      try {
+        await this.port.close();
+      } catch (e) {
+        console.warn('Port close warning:', e);
+      }
     }
+    this.port = null;
 
     if (this.statusCallback) this.statusCallback('DISCONNECTED', '연결 해제됨');
   }
@@ -94,21 +102,15 @@ export class WebSerialManager {
   }
 
   async startReading() {
-    const textDecoder = new TextDecoderStream();
-    const readableStreamClosed = this.port.readable.pipeTo(textDecoder.writable);
-    this.reader = textDecoder.readable.getReader();
-
+    this.reader = this.port.readable.getReader();
     let buffer = '';
 
     try {
-      while (true) {
+      while (this.isConnected) {
         const { value, done } = await this.reader.read();
-        if (done) {
-          this.reader.releaseLock();
-          break;
-        }
+        if (done) break;
         if (value) {
-          buffer += value;
+          buffer += this.textDecoder.decode(value, { stream: true });
           const lines = buffer.split('\n');
           buffer = lines.pop(); // keep trailing incomplete line
 
@@ -118,11 +120,20 @@ export class WebSerialManager {
         }
       }
     } catch (error) {
-      console.error('Serial Read Error:', error);
+      if (this.isConnected) {
+        console.error('Serial Read Error:', error);
+      }
     } finally {
+      if (this.reader) {
+        try { this.reader.releaseLock(); } catch (e) {}
+        this.reader = null;
+      }
+      const wasConnected = this.isConnected;
       this.isConnected = false;
       this.isConnecting = false;
-      if (this.statusCallback) this.statusCallback('DISCONNECTED', '연결 끊김');
+      if (wasConnected && this.statusCallback) {
+        this.statusCallback('DISCONNECTED', '연결 끊김');
+      }
     }
   }
 
@@ -154,7 +165,7 @@ export class WebSerialManager {
     // 3. If valid event parsed, log and dispatch
     if (event && event.type) {
       if (!event.source) event.source = 'ARDUINO';
-      
+
       // Debug Log 2: Parsed Arduino Event
       console.log('[Arduino Event]', event);
 
