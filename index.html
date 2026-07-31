@@ -3,146 +3,101 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cat Room ♥ 🐾 레트로 픽셀 다마고치 고양이 육성</title>
-  <meta name="description" content="레트로 픽셀 다마고치 내에서 귀여운 픽셀 고양이를 돌보고 방을 꾸미는 웹 게임 & Arduino 연동 샌드박스">
+  <title>NABI MEOW 🐱 Cat Room</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Outfit:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="index.css">
 </head>
 <body>
 
-  <!-- Header Bar -->
+  <!-- ── App Header ── -->
   <header class="app-header">
     <div class="brand-container">
-      <span class="brand-logo">🐱</span>
-      <h1 class="brand-title">Cat Room ♥</h1>
-      <button id="catNameBadge" class="cat-name-badge" title="고양이 이름 수정">나비</button>
+      <span class="brand-logo">🐾</span>
+      <span class="brand-title">Cat Room</span>
+      <span class="cat-name-badge" id="catNameBadge" title="클릭하여 이름 변경">나비</span>
     </div>
-    
     <div class="header-actions">
-      <button id="btnSerialConnect" class="header-action-btn" title="Arduino Web Serial 연동">
-        <span id="serialStatusDot" class="status-dot disconnected"></span>
-        <span>🔌 Arduino 연결</span>
-      </button>
-
-      <button id="btnOpenDecoration" class="header-action-btn" title="방 꾸미기 슬롯">
-        <span>🛋️ 방 꾸미기</span>
-      </button>
-
-      <button id="btnCaptureRoom" class="header-action-btn" title="포토 카드 캡처">
-        <span>📸 방 캡처</span>
-      </button>
-
-      <button id="btnResetData" class="header-action-btn" title="데이터 초기화">
-        <span>⚙️ 초기화</span>
+      <button class="header-action-btn" id="btnOpenDecoration">🛋️ 방 꾸미기</button>
+      <button class="header-action-btn" id="btnCaptureRoom">📸 사진 저장</button>
+      <button class="header-action-btn" id="btnSerialConnect">
+        <span class="status-dot disconnected" id="serialStatusDot"></span>
+        🔌 시리얼 연결
       </button>
     </div>
   </header>
 
-  <!-- 100vh Dashboard Grid Layout -->
+  <!-- ── 3-Column Dashboard ── -->
   <main class="dashboard-grid">
-    
-    <!-- Left Sidebar: Virtual Sensor Debug List (Redundant Care Panel Removed) -->
-    <aside class="sidebar-panel">
+
+    <!-- Left: Virtual Sensors -->
+    <aside class="sidebar-panel left-panel">
       <div class="panel-card">
-        <div class="panel-title">
-          <span>🧪 가상 센서 테스트</span>
-        </div>
+        <div class="panel-title">🧪 가상 센서 테스트</div>
         <div class="virtual-grid">
-          <button id="vbtnSlowApproach" class="virtual-btn">🚶 천천히 접근</button>
-          <button id="vbtnFastApproach" class="virtual-btn">🏃 갑자기 접근</button>
-          <button id="vbtnPersonLeft" class="virtual-btn">👋 사용자 떠남</button>
-          <button id="vbtnPetShort" class="virtual-btn">🖐️ 짧게 쓰다듬기</button>
-          <button id="vbtnPetLong" class="virtual-btn">🖐️ 오래 쓰다듬기</button>
-          <button id="vbtnFeed" class="virtual-btn">🍽️ 밥 주기</button>
-          <button id="vbtnLightBright" class="virtual-btn">☀️ 방 밝게 하기</button>
-          <button id="vbtnLightDark" class="virtual-btn">🌙 방 어둡게 하기</button>
+          <button class="virtual-btn" id="vbtnTouch">🖐️ 스킨십</button>
+          <button class="virtual-btn" id="vbtnSound">🔊 부르기</button>
+          <button class="virtual-btn" id="vbtnMotion">🏀 놀아주기</button>
+          <button class="virtual-btn" id="vbtnLightDark">🌙 밤 모드</button>
+          <button class="virtual-btn" id="vbtnTilt">⚠️ 흔들기</button>
+          <button class="virtual-btn" id="vbtnTempHigh">🔥 더움</button>
+          <button class="virtual-btn" id="vbtnTempLow">❄️ 추움</button>
         </div>
       </div>
     </aside>
 
-    <!-- Center Stage: Spacious 3D Glossy Tamagotchi Shell -->
+    <!-- Center: Tamagotchi Shell -->
     <section class="center-tamagotchi-stage">
       <div class="tamagotchi-shell-3d">
         <div class="tamagotchi-heart-hook"></div>
-        <div class="tamagotchi-title-text">Cat Room</div>
+        <div class="tamagotchi-title-text">나비's Room</div>
 
-        <!-- LCD Screen Frame (Fitted 100% inside shell) -->
         <div class="tamagotchi-screen-frame">
-          <div id="speechBubble" class="speech-bubble-overlay">
-            <span id="speechBubbleText">반가워요! 당신의 관심이 필요해요.</span>
-          </div>
-
-          <div id="roomCanvasContainer" class="room-stage-container">
-            <!-- Room SVG & Pixel Cat Injected by JS -->
+          <div class="room-stage-container">
+            <div class="speech-bubble-overlay" id="speechBubbleOverlay">
+              💬 <span id="speechBubbleText">오늘도 잘 부탁해요! 냥♡</span>
+            </div>
+            <div id="roomCanvasContainer" style="width:100%;height:100%;"></div>
           </div>
         </div>
 
-        <!-- 4 Matched Tamagotchi Shell Buttons -->
         <div class="tamagotchi-4buttons-row">
-          <button id="btnShellFeed" class="shell-4btn feed" title="1: 밥 주기">🍽️</button>
-          <button id="btnShellPet" class="shell-4btn pet" title="2: 쓰다듬기">🖐️</button>
-          <button id="btnShellPlay" class="shell-4btn play" title="3: 놀아주기">🏀</button>
-          <button id="btnShellSleep" class="shell-4btn sleep" title="4: 재우기">🌙</button>
+          <button class="shell-4btn feed"  id="btnShellFeed"  title="Feed">🍽️</button>
+          <button class="shell-4btn pet"   id="btnShellPet"   title="Pet">🖐️</button>
+          <button class="shell-4btn play"  id="btnShellPlay"  title="Play">🏀</button>
+          <button class="shell-4btn sleep" id="btnShellSleep" title="Sleep">🌙</button>
         </div>
       </div>
     </section>
 
-    <!-- Right Sidebar: Vertical Cat State Metrics HUD -->
-    <aside class="sidebar-panel">
+    <!-- Right: Live Metrics -->
+    <aside class="sidebar-panel right-panel">
       <div class="panel-card">
         <div class="panel-title">
-          <span>📊 고양이 상태</span>
-          <span id="catBehaviorTag" style="font-size:12px; color:var(--primary-pink);">💬 평온함</span>
+          <span>📊 실시간 고양이 상태</span>
+          <span class="behavior-tag" id="catBehaviorTag">💬 평온함</span>
         </div>
-
         <div class="metrics-vertical-list">
           <div class="metric-item">
-            <div class="metric-header">
-              <span>🐟 배고픔</span>
-              <span id="valHunger">30 / 100</span>
-            </div>
-            <div class="metric-bar-bg">
-              <div id="barHunger" class="metric-bar-fill hunger" style="width: 30%;"></div>
-            </div>
+            <div class="metric-header"><span>🥣 포만감</span><span id="valHunger">80%</span></div>
+            <div class="metric-bar-bg"><div class="metric-bar-fill hunger" id="barHunger" style="width:80%"></div></div>
           </div>
-
           <div class="metric-item">
-            <div class="metric-header">
-              <span>💕 행복도</span>
-              <span id="valHappiness">70 / 100</span>
-            </div>
-            <div class="metric-bar-bg">
-              <div id="barHappiness" class="metric-bar-fill happiness" style="width: 70%;"></div>
-            </div>
+            <div class="metric-header"><span>🙂 행복도</span><span id="valHappiness">70%</span></div>
+            <div class="metric-bar-bg"><div class="metric-bar-fill happiness" id="barHappiness" style="width:70%"></div></div>
           </div>
-
           <div class="metric-item">
-            <div class="metric-header">
-              <span>✨ 친밀도</span>
-              <span id="valAffection">20 / 100</span>
-            </div>
-            <div class="metric-bar-bg">
-              <div id="barAffection" class="metric-bar-fill affection" style="width: 20%;"></div>
-            </div>
+            <div class="metric-header"><span>💖 친밀도</span><span id="valAffection">90%</span></div>
+            <div class="metric-bar-bg"><div class="metric-bar-fill affection" id="barAffection" style="width:90%"></div></div>
           </div>
-
           <div class="metric-item">
-            <div class="metric-header">
-              <span>⚡ 에너지</span>
-              <span id="valEnergy">80 / 100</span>
-            </div>
-            <div class="metric-bar-bg">
-              <div id="barEnergy" class="metric-bar-fill energy" style="width: 80%;"></div>
-            </div>
+            <div class="metric-header"><span>⚡ 체력</span><span id="valEnergy">60%</span></div>
+            <div class="metric-bar-bg"><div class="metric-bar-fill energy" id="barEnergy" style="width:60%"></div></div>
           </div>
-
           <div class="metric-item">
-            <div class="metric-header">
-              <span>💢 스트레스</span>
-              <span id="valStress">10 / 100</span>
-            </div>
-            <div class="metric-bar-bg">
-              <div id="barStress" class="metric-bar-fill stress" style="width: 10%;"></div>
-            </div>
+            <div class="metric-header"><span>🌧️ 스트레스</span><span id="valStress">20%</span></div>
+            <div class="metric-bar-bg"><div class="metric-bar-fill stress" id="barStress" style="width:20%"></div></div>
           </div>
         </div>
       </div>
@@ -150,33 +105,40 @@
 
   </main>
 
-  <!-- Room Decoration Drawer Modal -->
-  <div id="drawerBackdrop" class="drawer-backdrop">
+  <!-- ── Decoration Drawer (NABI MEOW catalog style) ── -->
+  <div class="drawer-backdrop" id="drawerBackdrop">
     <div class="drawer-content">
-      <div class="drawer-header" style="display:flex; justify-content:space-between; align-items:center;">
-        <h2>🛋️ 방 꾸미기 슬롯</h2>
-        <button id="btnCloseDrawer" class="header-action-btn">✕</button>
+
+      <!-- Drawer header -->
+      <div class="drawer-header">
+        <div class="drawer-header-left">
+          <span class="drawer-brand">🐾 NABI MEOW</span>
+          <span class="drawer-subtitle">방 꾸미기 상점</span>
+        </div>
+        <button id="btnCloseDrawer" class="drawer-close-btn" aria-label="닫기">✕</button>
       </div>
 
-      <div id="drawerSlotTabs" class="slot-tabs" style="display:flex; gap:6px; overflow-x:auto;">
-        <!-- Dynamic Tabs -->
-      </div>
+      <!-- Category tabs -->
+      <div class="drawer-tabs" id="drawerSlotTabs"></div>
 
-      <div id="drawerItemsGrid" class="items-grid">
-        <!-- Dynamic Item Cards -->
-      </div>
+      <!-- Items grid (populated by JS) -->
+      <div class="drawer-catalog" id="drawerItemsGrid"></div>
+
     </div>
   </div>
 
-  <!-- Onboarding Cat Naming Modal -->
-  <div id="modalOnboardingBackdrop" class="modal-backdrop">
+  <!-- ── Onboarding Modal ── -->
+  <div class="modal-backdrop" id="onboardingBackdrop">
     <div class="modal-box">
-      <h2>🐱 고양이의 이름을 정해 주세요!</h2>
-      <p style="color:var(--text-muted); font-size:14px;">다마고치에 찾아온 귀여운 픽셀 고양이에게 특별한 이름을 선물하세요.</p>
-      <input type="text" id="inputCatName" class="form-input" placeholder="고양이 이름 (예: 나비)" maxlength="12">
-      <button id="btnSaveCatName" class="header-action-btn" style="justify-content:center; margin-top:8px; background:var(--primary-pink); color:#fff; border:none; padding:10px;">입력 완료</button>
+      <h2>🐱 고양이 이름을 지어주세요!</h2>
+      <p style="font-size:14px;color:#666;">당신의 다마고치 고양이 이름을 입력해 주세요.</p>
+      <input type="text" id="inputCatName" class="form-input" placeholder="이름 (예: 나비)" maxlength="10" value="나비">
+      <button class="btn-primary" id="btnSaveCatName">확인</button>
     </div>
   </div>
+
+  <!-- Toast -->
+  <div id="toastContainer"></div>
 
   <script type="module" src="js/app.js"></script>
 </body>

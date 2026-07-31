@@ -1,23 +1,15 @@
-/* Cat Room - 100vh Single Dashboard & Sleek 3D Tamagotchi System */
+/* Cat Room - 100vh Single Dashboard & Warm Pastel System */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Press+Start+2P&family=Noto+Sans+KR:wght@400;500;700&display=swap');
 
 :root {
   --bg-page: #fef8e7;
   --header-bg: #fffdf0;
+  --panel-bg: #fffcf4;
+  --panel-border: #f5e6d3;
   
-  /* Sleek Seamless 3D Glossy Shell Gradient (NO WHITE BORDER STROKE) */
+  /* Sleek Seamless 3D Glossy Shell Gradient (NO STROKE BORDER ANYWHERE) */
   --shell-3d-gradient: linear-gradient(155deg, #ff9ebb 0%, #ff70a6 40%, #e056fd 100%);
-  --shell-shadow: 0 32px 75px rgba(255, 112, 166, 0.5), inset 0 12px 24px rgba(255, 255, 255, 0.55), inset 0 -12px 24px rgba(0, 0, 0, 0.18);
-  
-  /* Pastel Buttons Palette */
-  --btn-feed-bg: #ffebee;
-  --btn-feed-color: #d81b60;
-  --btn-pet-bg: #fff8e1;
-  --btn-pet-color: #f57f17;
-  --btn-play-bg: #e8f5e9;
-  --btn-play-color: #2e7d32;
-  --btn-sleep-bg: #f3e5f5;
-  --btn-sleep-color: #6a1b9a;
+  --shell-shadow: 0 36px 85px rgba(255, 112, 166, 0.52), inset 0 14px 28px rgba(255, 255, 255, 0.55), inset 0 -14px 28px rgba(0, 0, 0, 0.18);
 
   --text-dark: #333333;
   --text-muted: #888888;
@@ -41,14 +33,11 @@ html, body {
 
 body {
   font-family: 'Outfit', 'Noto Sans KR', sans-serif;
-  background-color: var(--bg-page);
+  background: linear-gradient(135deg, #fef8e7 0%, #fff3e0 100%);
   color: var(--text-dark);
   display: flex;
   flex-direction: column;
   position: relative;
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(255, 112, 166, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(255, 230, 0, 0.08) 0%, transparent 40%);
 }
 
 /* Header Bar */
@@ -59,7 +48,7 @@ body {
   align-items: center;
   justify-content: space-between;
   background: var(--header-bg);
-  border-bottom: 1px solid #f0e6d2;
+  border-bottom: 1px solid var(--panel-border);
   z-index: 10;
   flex-shrink: 0;
 }
@@ -82,6 +71,7 @@ body {
 }
 
 .cat-name-badge {
+  font-family: 'Outfit', 'Noto Sans KR', sans-serif;
   background: #fff0f5;
   border: 1.5px solid #ffb7c5;
   color: #d81b60;
@@ -104,8 +94,8 @@ body {
 }
 
 .header-action-btn {
-  background: #ffffff;
-  border: 1.5px solid #f0e6d2;
+  background: var(--panel-bg);
+  border: 1.5px solid var(--panel-border);
   color: var(--text-dark);
   padding: 6px 14px;
   border-radius: 20px;
@@ -116,7 +106,7 @@ body {
   gap: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.02);
 }
 
 .header-action-btn:hover {
@@ -140,15 +130,15 @@ body {
 .dashboard-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: 280px 1fr 280px;
-  gap: 20px;
-  padding: 12px 24px;
+  grid-template-columns: 260px 1fr 260px;
+  gap: 16px;
+  padding: 10px 20px;
   height: calc(100vh - 60px);
   overflow: hidden;
   align-items: center;
 }
 
-/* Sidebar Panels */
+/* Sidebar Panels (WARM PASTEL CREAM, NO STARK WHITE GAPS) */
 .sidebar-panel {
   display: flex;
   flex-direction: column;
@@ -160,11 +150,11 @@ body {
 }
 
 .panel-card {
-  background: #ffffff;
-  border: 1px solid #f0e6d2;
+  background: var(--panel-bg);
+  border: 1.5px solid var(--panel-border);
   border-radius: var(--radius-card);
   padding: 16px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.02);
 }
 
 .panel-title {
@@ -177,6 +167,11 @@ body {
   justify-content: space-between;
 }
 
+.behavior-tag {
+  font-size: 12px;
+  font-weight: 700;
+}
+
 /* Virtual Sensor List */
 .virtual-grid {
   display: grid;
@@ -185,7 +180,7 @@ body {
 }
 
 .virtual-btn {
-  background: #fdfbf7;
+  background: #ffffff;
   border: 1px solid #eee5d8;
   color: var(--text-dark);
   padding: 8px 12px;
@@ -241,7 +236,7 @@ body {
 .metric-bar-fill.energy { background: #70a1ff; }
 .metric-bar-fill.stress { background: #a55eea; }
 
-/* Center Stage: Vertically Elongated 3D Tamagotchi Shell (Screen Clipped 100% Inside) */
+/* Center Stage: Vertically & Horizontally Spacious 3D Tamagotchi Shell (HUGE EGG SHELL) */
 .center-tamagotchi-stage {
   display: flex;
   align-items: center;
@@ -250,51 +245,54 @@ body {
 }
 
 .tamagotchi-shell-3d {
-  width: 620px;
-  min-height: 560px; /* Vertically elongated sleek egg shape */
+  width: 760px;
+  max-width: 98%;
+  min-height: 600px;
   background: var(--shell-3d-gradient);
-  border: none; /* NO WHITE STROKE BORDER */
-  border-radius: 310px 310px 260px 260px;
-  padding: 34px 44px 44px 44px;
+  border: none;
+  border-radius: 380px 380px 320px 320px;
+  padding: 44px 50px 50px 50px;
   box-shadow: var(--shell-shadow);
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   position: relative;
-  overflow: hidden; /* Clips any screen overflow inside the shell */
+  overflow: hidden;
 }
 
 /* Top Heart Ring Hook */
 .tamagotchi-heart-hook {
   position: absolute;
-  top: -24px;
-  width: 48px;
-  height: 48px;
+  top: -26px;
+  width: 52px;
+  height: 52px;
   background: #ffffff;
-  clip-path: path("M 24 44 C 24 44 4 30 4 15 C 4 7 12 0 21 0 C 26 0 30 4 32 8 C 34 4 38 0 43 0 C 52 0 66 8 66 15 C 66 30 40 44 40 44 Z");
-  transform: scale(0.8);
+  clip-path: path("M 26 48 C 26 48 4 33 4 17 C 4 8 13 0 23 0 C 28 0 33 4 35 9 C 37 4 42 0 47 0 C 57 0 66 8 66 17 C 66 33 44 48 44 48 Z");
+  transform: scale(0.85);
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
 .tamagotchi-title-text {
-  font-family: 'Press Start 2P', cursive, sans-serif;
-  font-size: 16px;
+  font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+  font-size: 19px;
+  font-weight: 700;
   color: #ffffff;
   text-shadow: 0 2px 6px rgba(216, 27, 96, 0.6);
-  margin-bottom: 14px;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
 }
 
-/* LCD Screen Frame Fitted Perfectly inside Shell Boundary */
+/* Borderless LCD Screen Frame (Centered inside Shell) */
 .tamagotchi-screen-frame {
-  width: 100%;
-  max-width: 420px;
-  height: 310px;
+  width: 440px;
+  height: 330px;
   background: #ffffff;
-  border: 6px solid #f8bbd0;
-  border-radius: 24px;
+  border: none;
+  border-radius: 20px;
   position: relative;
   overflow: hidden;
-  box-shadow: inset 0 4px 14px rgba(0, 0, 0, 0.08);
+  box-shadow: inset 0 4px 14px rgba(0, 0, 0, 0.12), 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .room-stage-container {
@@ -310,7 +308,7 @@ body {
   display: block;
 }
 
-/* Single Line Speech Bubble Overlay (No Awkward Wrap) */
+/* Single Line Speech Bubble Overlay */
 .speech-bubble-overlay {
   position: absolute;
   top: 14px;
@@ -331,20 +329,20 @@ body {
   z-index: 10;
 }
 
-/* 4 Physical Matched Tamagotchi Buttons on Shell Bottom (NO WHITE STROKE) */
+/* 4 Physical Matched Tamagotchi Buttons on Shell Bottom (NO STROKE) */
 .tamagotchi-4buttons-row {
   display: flex;
   justify-content: center;
-  gap: 26px;
-  margin-top: 24px;
+  gap: 28px;
+  margin-top: 26px;
   width: 100%;
 }
 
 .shell-4btn {
-  width: 66px;
-  height: 66px;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
-  border: none; /* NO WHITE STROKE BORDER */
+  border: none;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22), inset 0 -4px 8px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   display: flex;
@@ -352,7 +350,7 @@ body {
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
-  font-size: 22px;
+  font-size: 24px;
 }
 
 .shell-4btn.feed { background: linear-gradient(145deg, #ffffff, #ffcdd2); }
@@ -362,6 +360,50 @@ body {
 
 .shell-4btn:hover { transform: translateY(-3px) scale(1.06); }
 .shell-4btn:active { transform: translateY(2px) scale(0.95); }
+
+/* Toast Container Positioned Guaranteed Above Shell Hook (z-index: 99999) */
+#toastContainer {
+  position: fixed;
+  top: 75px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.toast-center-card {
+  background: rgba(255, 255, 255, 0.98);
+  border: 2px solid var(--primary-pink);
+  color: #333333;
+  padding: 12px 26px;
+  border-radius: 30px;
+  font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 16px 40px rgba(255, 112, 166, 0.35), 0 6px 14px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(12px);
+  animation: toastCenterPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toast-center-card.hide {
+  animation: toastCenterFade 0.3s ease forwards;
+}
+
+@keyframes toastCenterPop {
+  0% { opacity: 0; transform: scale(0.7) translateY(-15px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes toastCenterFade {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.85); }
+}
 
 /* Polished Pastel Modals & Drawer */
 .drawer-backdrop, .modal-backdrop {
@@ -383,49 +425,187 @@ body {
   pointer-events: auto;
 }
 
+/* ── NABI MEOW Catalog Drawer ──────────────────────────────────── */
 .drawer-content {
   position: fixed;
   right: 0;
   top: 0;
   bottom: 0;
-  width: 400px;
-  background: #ffffff;
-  padding: 24px;
+  width: 480px;
+  background: #fff8f5;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+  gap: 0;
+  box-shadow: -12px 0 36px rgba(255,112,166,0.18);
   transform: translateX(100%);
-  transition: transform 0.3s ease;
+  transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
   z-index: 301;
+  overflow: hidden;
 }
 
 .drawer-backdrop.active .drawer-content { transform: translateX(0); }
 
-.slot-tab-btn {
-  background: #fef8e7;
-  border: 1.5px solid #f0e6d2;
-  color: var(--text-dark);
-  padding: 6px 14px;
-  border-radius: 18px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px 14px;
+  background: linear-gradient(135deg, #ff9ebb, #ff70a6);
+  flex-shrink: 0;
 }
 
+.drawer-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.drawer-brand {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 12px;
+  color: #ffffff;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+}
+
+.drawer-subtitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+}
+
+.drawer-close-btn {
+  background: rgba(255,255,255,0.25);
+  border: none;
+  color: #ffffff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.drawer-close-btn:hover { background: rgba(255,255,255,0.45); }
+
+/* Category Tabs */
+.drawer-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 12px 20px 10px;
+  background: #fff0f5;
+  border-bottom: 1.5px solid #ffd1dc;
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+.drawer-tabs::-webkit-scrollbar { display: none; }
+
+.slot-tab-btn {
+  background: #ffffff;
+  border: 1.5px solid #ffd1dc;
+  color: #d81b60;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+  transition: all 0.18s ease;
+}
+.slot-tab-btn:hover { background: #fff0f5; }
 .slot-tab-btn.active {
   background: var(--primary-pink);
   color: #ffffff;
   border-color: var(--primary-pink);
+  box-shadow: 0 3px 10px rgba(255,112,166,0.4);
 }
 
-.items-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+/* Catalog Content Area */
+.drawer-catalog {
+  flex: 1;
   overflow-y: auto;
+  padding: 16px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
+
+.drawer-section-header {
+  font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #d81b60;
+  text-align: center;
+  background: #fff0f5;
+  border: 1.5px dashed #ffd1dc;
+  border-radius: 12px;
+  padding: 8px 16px;
+}
+
+.drawer-items-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.drawer-item-card {
+  background: #ffffff;
+  border: 2px solid #ffd1dc;
+  border-radius: 16px;
+  padding: 14px 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-align: center;
+  min-height: 100px;
+}
+.drawer-item-card:hover {
+  background: #fff0f5;
+  border-color: var(--primary-pink);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255,112,166,0.2);
+}
+.drawer-item-card.equipped {
+  background: #e8f5e9;
+  border-color: #4caf50;
+  box-shadow: 0 4px 12px rgba(76,175,80,0.25);
+}
+.drawer-item-card.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+.drawer-item-card.locked:hover {
+  transform: none;
+  background: #ffffff;
+  border-color: #ffd1dc;
+}
+
+.drawer-item-icon { font-size: 36px; line-height: 1; }
+
+.drawer-item-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #555;
+  line-height: 1.3;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.drawer-item-badge {
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 2px 7px;
+}
+.equipped-badge { background: #e8f5e9; color: #4caf50; }
+.lock-badge { background: #fafafa; color: #aaa; }
 
 .item-card {
   background: #fffdf7;
@@ -446,6 +626,44 @@ body {
 }
 
 .item-card.equipped { border-color: #2ed573; background: #e8f5e9; }
+.item-card.locked { opacity: 0.55; cursor: not-allowed; }
+
+.lock-badge {
+  font-size: 16px;
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.drawer-header h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.drawer-close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.drawer-close-btn:hover { color: var(--primary-pink); }
+
+.drawer-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  flex-shrink: 0;
+}
 
 .modal-box {
   background: #ffffff;
@@ -468,6 +686,21 @@ body {
   outline: none;
 }
 
+.btn-primary {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--primary-pink);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+  transition: background 0.2s ease;
+}
+.btn-primary:hover { background: #e0468a; }
+
 /* Animations */
 @keyframes catPurr {
   0%, 100% { transform: translateY(0); }
@@ -485,6 +718,14 @@ body {
   40%, 80% { transform: translateX(5px); }
 }
 
+@keyframes catPlayBounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-14px) scale(1.05); }
+  50% { transform: translateY(0) scale(0.95); }
+  70% { transform: translateY(-8px) scale(1.02); }
+}
+
 .anim-purr { animation: catPurr 2s infinite ease-in-out; }
 .anim-sleep { animation: catSleep 2.5s infinite ease-in-out; }
 .anim-shake { animation: catShake 0.4s ease; }
+.anim-play { animation: catPlayBounce 1.2s infinite ease-in-out; }

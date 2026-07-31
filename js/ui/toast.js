@@ -1,9 +1,10 @@
 /**
  * Cat Room - In-Game Toast Notifications Manager
+ * Displays beautiful notification cards above the Tamagotchi device shell.
  */
 
 export class ToastManager {
-  static show(message, duration = 3000) {
+  static show(message, duration = 2500) {
     let container = document.getElementById('toastContainer');
     if (!container) {
       container = document.createElement('div');
@@ -11,15 +12,16 @@ export class ToastManager {
       document.body.appendChild(container);
     }
 
+    container.innerHTML = '';
+
     const toast = document.createElement('div');
-    toast.className = 'toast-message';
+    toast.className = 'toast-center-card';
     toast.textContent = message;
 
     container.appendChild(toast);
 
     setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transition = 'opacity 0.3s ease';
+      toast.classList.add('hide');
       setTimeout(() => toast.remove(), 300);
     }, duration);
   }

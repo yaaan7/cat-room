@@ -1,5 +1,7 @@
 /**
- * Cat Room - 9-Slot Room Decoration Drawer Component
+ * Cat Room - Decoration Drawer
+ * UI matches the NABI MEOW reference: 9-section catalog grid with
+ * category headers, 3-per-row item cards, lock badges.
  */
 
 import { ROOM_SLOTS, ITEM_CATALOG } from '../config.js';
@@ -11,11 +13,11 @@ export class DecorationDrawer {
     this.onRoomUpdate = onRoomUpdate;
     this.activeSlotId = 'wallpaper';
 
-    this.backdrop = document.getElementById('drawerBackdrop');
+    this.backdrop      = document.getElementById('drawerBackdrop');
     this.tabsContainer = document.getElementById('drawerSlotTabs');
-    this.itemsGrid = document.getElementById('drawerItemsGrid');
-    this.btnClose = document.getElementById('btnCloseDrawer');
-    this.btnOpen = document.getElementById('btnOpenDecoration');
+    this.itemsGrid     = document.getElementById('drawerItemsGrid');
+    this.btnClose      = document.getElementById('btnCloseDrawer');
+    this.btnOpen       = document.getElementById('btnOpenDecoration');
 
     this.init();
   }
@@ -28,7 +30,6 @@ export class DecorationDrawer {
         if (e.target === this.backdrop) this.close();
       });
     }
-
     this.renderTabs();
   }
 
@@ -44,7 +45,6 @@ export class DecorationDrawer {
   renderTabs() {
     if (!this.tabsContainer) return;
     this.tabsContainer.innerHTML = '';
-
     ROOM_SLOTS.forEach(slot => {
       const btn = document.createElement('button');
       btn.className = `slot-tab-btn ${slot.id === this.activeSlotId ? 'active' : ''}`;
@@ -64,58 +64,75 @@ export class DecorationDrawer {
 
     const data = this.storageManager.loadData();
     const unlockedSet = new Set(data.unlockedItems || []);
-    const equippedSlotValue = data.roomSlots[this.activeSlotId];
 
+    // Find active slot info
+    const slot = ROOM_SLOTS.find(s => s.id === this.activeSlotId);
     const catalogItems = ITEM_CATALOG[this.activeSlotId] || [];
+    const equippedId   = data.roomSlots[this.activeSlotId];
+
+    // Section header like reference: "♥ 1. Wallpaper (3) ♥"
+    const slotIndex = ROOM_SLOTS.findIndex(s => s.id === this.activeSlotId) + 1;
+    const header = document.createElement('div');
+    header.className = 'drawer-section-header';
+    header.textContent = `♥ ${slotIndex}. ${slot?.label} (${catalogItems.length}) ♥`;
+    this.itemsGrid.appendChild(header);
+
+    // Items row
+    const row = document.createElement('div');
+    row.className = 'drawer-items-row';
 
     catalogItems.forEach(item => {
-      const card = document.createElement('div');
       const isUnlocked = item.default || unlockedSet.has(item.id);
-      const isEquipped = equippedSlotValue === item.id;
+      const isEquipped = equippedId === item.id;
 
-      card.className = `item-card ${isEquipped ? 'equipped' : ''} ${!isUnlocked ? 'locked' : ''}`;
+      const card = document.createElement('div');
+      card.className = `drawer-item-card ${isEquipped ? 'equipped' : ''} ${!isUnlocked ? 'locked' : ''}`;
 
       card.innerHTML = `
-        <div style="font-size:32px;">${item.icon}</div>
-        <div style="font-size:13px; font-weight:600; text-align:center;">${item.name}</div>
-        ${!isUnlocked ? `<span class="lock-badge">🔒</span>` : ''}
-        ${isEquipped ? `<span style="font-size:11px; color:var(--success-color); font-weight:600;">✓ 착용 중</span>` : ''}
+        <div class="drawer-item-icon">${item.icon}</div>
+        <div class="drawer-item-name">${item.name}</div>
+        ${isEquipped ? '<div class="drawer-item-badge equipped-badge">✓ 착용 중</div>' : ''}
+        ${!isUnlocked ? `<div class="drawer-item-badge lock-badge">🔒 해금 필요</div>` : ''}
       `;
 
       card.addEventListener('click', () => {
         if (!isUnlocked) {
-          ToastManager.show(`🔒 해금 필요: ${this.getUnlockHint(item.unlockCondition)}`);
+          ToastManager.show(`🔒 ${this.getUnlockHint(item.unlockCondition)}`);
           return;
         }
-
-        // Equip Item
-        data.roomSlots[this.activeSlotId] = item.id;
-        this.storageManager.saveData(data);
+        // Equip: update storage and trigger room re-render
+        const freshData = this.storageManager.loadData();
+        freshData.roomSlots[this.activeSlotId] = item.id;
+        this.storageManager.saveData(freshData);
         ToastManager.show(`✨ ${item.name} 배치 완료!`);
         this.renderItems();
-        if (this.onRoomUpdate) this.onRoomUpdate(data.roomSlots);
+        if (this.onRoomUpdate) this.onRoomUpdate(freshData.roomSlots);
       });
 
-      this.itemsGrid.appendChild(card);
+      row.appendChild(card);
     });
+
+    this.itemsGrid.appendChild(row);
   }
 
   getUnlockHint(cond) {
     if (!cond) return '업적 달성 필요';
-    if (cond === 'feedCount:1') return '첫 밥 주기 달성';
-    if (cond === 'feedCount:10') return '밥 주기 10회 달성';
-    if (cond === 'affection:30') return '친밀도 30 달성';
-    if (cond === 'affection:40') return '친밀도 40 달성';
-    if (cond === 'affection:50') return '친밀도 50 달성';
-    if (cond === 'affection:60') return '친밀도 60 달성';
-    if (cond === 'petCount:5') return '쓰다듬기 5회 달성';
-    if (cond === 'petCount:10') return '쓰다듬기 10회 달성';
-    if (cond === 'playCount:5') return '놀아주기 5회 달성';
-    if (cond === 'playCount:10') return '놀아주기 10회 달성';
-    if (cond === 'captureCount:1') return '사진 캡처 1회 달성';
-    if (cond === 'captureCount:2') return '사진 캡처 2회 달성';
-    if (cond === 'captureCount:3') return '사진 캡처 3회 달성';
-    if (cond === 'arduinoConnected:true') return 'Arduino 최초 1회 연동 달성';
-    return '특수 조건 달성 필요';
+    const map = {
+      'feedCount:1':  '첫 밥 주기 달성',
+      'feedCount:10': '밥 주기 10회 달성',
+      'affection:30': '친밀도 30 달성',
+      'affection:40': '친밀도 40 달성',
+      'affection:50': '친밀도 50 달성',
+      'affection:60': '친밀도 60 달성',
+      'petCount:5':   '쓰다듬기 5회 달성',
+      'petCount:10':  '쓰다듬기 10회 달성',
+      'playCount:5':  '놀아주기 5회 달성',
+      'playCount:10': '놀아주기 10회 달성',
+      'captureCount:1': '사진 캡처 1회 달성',
+      'captureCount:2': '사진 캡처 2회 달성',
+      'captureCount:3': '사진 캡처 3회 달성',
+      'arduinoConnected:true': 'Arduino 연동 달성'
+    };
+    return map[cond] || '특수 조건 달성 필요';
   }
 }

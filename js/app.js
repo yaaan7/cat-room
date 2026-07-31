@@ -26,7 +26,7 @@ class CatRoomApp {
       currentState: this.storageData.currentState
     });
 
-    this.currentSpeechText = "반가워요! 당신의 관심이 필요해요.";
+    this.currentSpeechText = "오늘도 잘 부탁해요! 냥♡";
 
     this.dispatcher = new GameEventDispatcher(
       this.catState,
@@ -129,6 +129,10 @@ class CatRoomApp {
   updateCatNameDisplay() {
     const badge = document.getElementById('catNameBadge');
     if (badge) badge.textContent = this.catState.name;
+
+    // Dynamically update Tamagotchi Shell title text to ♥ [Cat Name]'s Room ♥!
+    const shellTitle = document.querySelector('.tamagotchi-title-text');
+    if (shellTitle) shellTitle.textContent = `♥ ${this.catState.name}'s Room ♥`;
   }
 
   handleGameUpdate(payload) {
@@ -137,6 +141,13 @@ class CatRoomApp {
       const bubble = document.getElementById('speechBubbleText');
       if (bubble) bubble.textContent = payload.reactionText;
     }
+
+    // Synchronize storageData from StorageManager so newly unlocked items and counters are NEVER overwritten
+    const freshData = StorageManager.loadData();
+    this.storageData.unlockedItems = freshData.unlockedItems || [];
+    this.storageData.counters = freshData.counters || {};
+    this.storageData.flags = freshData.flags || {};
+    if (freshData.roomSlots) this.storageData.roomSlots = freshData.roomSlots;
 
     // Auto-save State
     this.storageData.metrics = {
@@ -175,7 +186,11 @@ class CatRoomApp {
     if (!container) return;
 
     const catSvg = CatRenderer.renderSvg(this.catState.currentState);
-    const roomSvg = RoomRenderer.renderRoomSvg(this.storageData.roomSlots, catSvg);
+    const roomSvg = RoomRenderer.renderRoomSvg(
+      this.storageData.roomSlots,
+      catSvg,
+      this.catState.currentState
+    );
 
     container.innerHTML = roomSvg;
   }
@@ -199,8 +214,9 @@ class CatRoomApp {
   setMetricBar(barId, valId, value) {
     const bar = document.getElementById(barId);
     const val = document.getElementById(valId);
-    if (bar) bar.style.width = `${value}%`;
-    if (val) val.textContent = `${value} / 100`;
+    const clamped = Math.max(0, Math.min(100, Math.round(value)));
+    if (bar) bar.style.width = `${clamped}%`;
+    if (val) val.textContent = `${clamped}%`;
   }
 
   startTickLoop() {
