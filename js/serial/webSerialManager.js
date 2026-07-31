@@ -1,11 +1,12 @@
 /**
  * Cat Room - Web Serial API Integration Manager
  *
- * Parses text-based Arduino serial output:
- *   Events:   "[FEED] Button pressed"
- *             "[PET] Hand detected"
- *             "[PET] Hand removed"
- *   Sensors:  "Light=XXX | Distance=XXcm | Pet=DETECTED/NONE | Feed=PRESSED/RELEASED"
+ * Responsibilities:
+ * - Handle Serial Port connection lifecycle and status callbacks
+ * - Read incoming raw serial text line-by-line
+ * - Output debug log `console.log('[Serial Raw]', trimmed)`
+ * - Parse JSON events (or fallback text format) and log `console.log('[Arduino Event]', event)`
+ * - Forward events directly to GameEventDispatcher without modifying game state directly.
  */
 
 export class WebSerialManager {
@@ -15,11 +16,7 @@ export class WebSerialManager {
     this.port = null;
     this.reader = null;
     this.isConnected = false;
-
-    // Track light state to detect transitions
-    this.lastLightDark = null;
-    // Track distance for approach detection
-    this.lastDistance = -1;
+    this.isConnecting = false;
   }
 
   isSupported() {
@@ -32,38 +29,59 @@ export class WebSerialManager {
       return false;
     }
 
+    if (this.isConnecting || this.isConnected) {
+      return false;
+    }
+
+    this.isConnecting = true;
+    if (this.statusCallback) this.statusCallback('CONNECTING', '연결 중...');
+
     try {
       this.port = await navigator.serial.requestPort();
       await this.port.open({ baudRate: 9600 });
       this.isConnected = true;
+      this.isConnecting = false;
 
-      if (this.statusCallback) this.statusCallback(true, 'Arduino 연결됨');
+      if (this.statusCallback) this.statusCallback('CONNECTED', '페어링됨');
+      
+      // Mark arduino connected flag in storage
+      if (this.eventDispatcher && this.eventDispatcher.storageManager) {
+        const data = this.eventDispatcher.storageManager.loadData();
+        if (!data.flags) data.flags = {};
+        data.flags.hasConnectedArduino = true;
+        this.eventDispatcher.storageManager.saveData(data);
+        if (this.eventDispatcher.checkUnlockableItems) {
+          this.eventDispatcher.checkUnlockableItems();
+        }
+      }
+
       this.startReading();
       return true;
     } catch (err) {
       console.error('Serial Connection Error:', err);
       this.isConnected = false;
-      if (this.statusCallback) this.statusCallback(false, '연결 실패 또는 취소됨');
+      this.isConnecting = false;
+      if (this.statusCallback) this.statusCallback('DISCONNECTED', '연결 끊김');
       return false;
     }
   }
 
   async disconnect() {
+    this.isConnected = false;
+    this.isConnecting = false;
+
     if (this.reader) {
       try { await this.reader.cancel(); }
-      catch (e) { console.warn('Reader cancel:', e); }
+      catch (e) { console.warn('Reader cancel warning:', e); }
     }
     if (this.port) {
       try { await this.port.close(); }
-      catch (e) { console.warn('Port close:', e); }
+      catch (e) { console.warn('Port close warning:', e); }
     }
-    this.isConnected = false;
-    if (this.statusCallback) this.statusCallback(false, '연결 해제됨');
+
+    if (this.statusCallback) this.statusCallback('DISCONNECTED', '연결 해제됨');
   }
 
-  /**
-   * Send a command string to Arduino (e.g. for NeoPixel color control)
-   */
   async sendCommand(cmd) {
     if (!this.port || !this.port.writable) return;
     const encoder = new TextEncoder();
@@ -92,10 +110,10 @@ export class WebSerialManager {
         if (value) {
           buffer += value;
           const lines = buffer.split('\n');
-          buffer = lines.pop(); // keep incomplete chunk
+          buffer = lines.pop(); // keep trailing incomplete line
 
           for (const line of lines) {
-            this.parseLine(line.trim());
+            this.processRawLine(line.trim());
           }
         }
       }
@@ -103,93 +121,70 @@ export class WebSerialManager {
       console.error('Serial Read Error:', error);
     } finally {
       this.isConnected = false;
-      if (this.statusCallback) this.statusCallback(false, '연결 이탈됨');
+      this.isConnecting = false;
+      if (this.statusCallback) this.statusCallback('DISCONNECTED', '연결 끊김');
     }
   }
 
   /**
-   * Parse a single line from Arduino serial output
+   * Process each line received over Web Serial
    */
-  parseLine(line) {
-    if (!line) return;
+  processRawLine(trimmed) {
+    if (!trimmed) return;
 
-    // ── Event lines ──────────────────────────────────────────
-    if (line === '[FEED] Button pressed') {
-      this.eventDispatcher.dispatch({ type: 'FEED', source: 'ARDUINO' });
-      return;
+    // Debug Log 1: Raw Serial Line
+    console.log('[Serial Raw]', trimmed);
+
+    let event = null;
+
+    // 1. Try parsing JSON format
+    if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+      try {
+        event = JSON.parse(trimmed);
+      } catch (e) {
+        console.warn('Failed to parse Serial JSON:', trimmed, e);
+      }
     }
 
-    if (line === '[PET] Hand detected') {
-      this.eventDispatcher.dispatch({ type: 'PET_SHORT', source: 'ARDUINO' });
-      return;
+    // 2. Fallback to Legacy Text Parsing if not JSON
+    if (!event) {
+      event = this.parseLegacyTextLine(trimmed);
     }
 
-    if (line === '[PET] Hand removed') {
-      // Hand removed → no special event, already dispatched PET on detect
-      return;
-    }
+    // 3. If valid event parsed, log and dispatch
+    if (event && event.type) {
+      if (!event.source) event.source = 'ARDUINO';
+      
+      // Debug Log 2: Parsed Arduino Event
+      console.log('[Arduino Event]', event);
 
-    // ── Periodic sensor line ─────────────────────────────────
-    // Format: "Light=XXX | Distance=XXcm | Pet=DETECTED | Feed=RELEASED"
+      // Dispatch to unified game dispatcher
+      if (this.eventDispatcher) {
+        this.eventDispatcher.dispatch(event);
+      }
+    }
+  }
+
+  /**
+   * Legacy text format parser for backward compatibility
+   */
+  parseLegacyTextLine(line) {
+    if (line === '[FEED] Button pressed') return { type: 'FEED' };
+    if (line === '[PET] Hand detected') return { type: 'PET_SHORT', duration: 500 };
     if (line.startsWith('Light=')) {
-      this.parseSensorLine(line);
-      return;
-    }
-
-    // Skip startup messages (=== Cat Room Hardware Test === etc.)
-  }
-
-  /**
-   * Parse periodic sensor data and dispatch derived events
-   */
-  parseSensorLine(line) {
-    const parts = {};
-    line.split('|').forEach(segment => {
-      const [key, val] = segment.trim().split('=');
-      if (key && val) parts[key.trim()] = val.trim();
-    });
-
-    // ── Light sensor → Day/Night ────────────────────────────
-    const lightVal = parseInt(parts['Light'], 10);
-    if (!isNaN(lightVal)) {
-      const isDark = lightVal < 300; // LDR threshold
-      if (this.lastLightDark !== isDark) {
-        this.lastLightDark = isDark;
-        this.eventDispatcher.dispatch({
-          type: isDark ? 'LIGHT_DARK' : 'LIGHT_BRIGHT',
-          source: 'ARDUINO',
+      const parts = {};
+      line.split('|').forEach(seg => {
+        const [k, v] = seg.trim().split('=');
+        if (k && v) parts[k.trim()] = v.trim();
+      });
+      const lightVal = parseInt(parts['Light'], 10);
+      if (!isNaN(lightVal)) {
+        return {
+          type: lightVal < 300 ? 'LIGHT_DARK' : 'LIGHT_BRIGHT',
           value: lightVal
-        });
+        };
       }
     }
-
-    // ── Distance sensor → Approach detection ────────────────
-    const distStr = parts['Distance'];
-    if (distStr && distStr !== 'NO_ECHO') {
-      const dist = parseInt(distStr, 10);
-      if (!isNaN(dist)) {
-        // Dispatch approach if someone is close
-        if (dist < 15 && this.lastDistance >= 15) {
-          this.eventDispatcher.dispatch({
-            type: 'APPROACH_FAST',
-            source: 'ARDUINO',
-            value: dist
-          });
-        } else if (dist < 30 && dist >= 15 && this.lastDistance >= 30) {
-          this.eventDispatcher.dispatch({
-            type: 'APPROACH_SLOW',
-            source: 'ARDUINO',
-            value: dist
-          });
-        } else if (dist >= 50 && this.lastDistance < 50 && this.lastDistance > 0) {
-          this.eventDispatcher.dispatch({
-            type: 'PERSON_LEFT',
-            source: 'ARDUINO',
-            value: dist
-          });
-        }
-        this.lastDistance = dist;
-      }
-    }
+    return null;
   }
 }

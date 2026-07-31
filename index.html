@@ -23,7 +23,7 @@
       <button class="header-action-btn" id="btnCaptureRoom">📸 사진 저장</button>
       <button class="header-action-btn" id="btnSerialConnect">
         <span class="status-dot disconnected" id="serialStatusDot"></span>
-        🔌 시리얼 연결
+        <span id="serialBtnText">Arduino 연결</span>
       </button>
     </div>
   </header>
@@ -36,13 +36,14 @@
       <div class="panel-card">
         <div class="panel-title">🧪 가상 센서 테스트</div>
         <div class="virtual-grid">
-          <button class="virtual-btn" id="vbtnTouch">🖐️ 스킨십</button>
-          <button class="virtual-btn" id="vbtnSound">🔊 부르기</button>
-          <button class="virtual-btn" id="vbtnMotion">🏀 놀아주기</button>
-          <button class="virtual-btn" id="vbtnLightDark">🌙 밤 모드</button>
-          <button class="virtual-btn" id="vbtnTilt">⚠️ 흔들기</button>
-          <button class="virtual-btn" id="vbtnTempHigh">🔥 더움</button>
-          <button class="virtual-btn" id="vbtnTempLow">❄️ 추움</button>
+          <button class="virtual-btn" id="vbtnFeed">🍽️ 밥 주기 (FEED)</button>
+          <button class="virtual-btn" id="vbtnPetShort">🖐️ 짧게 만지기 (PET_SHORT)</button>
+          <button class="virtual-btn" id="vbtnPetLong">💖 오래 쓰다듬기 (PET_LONG)</button>
+          <button class="virtual-btn" id="vbtnSlowApproach">🐱 천천히 접근 (SLOW)</button>
+          <button class="virtual-btn" id="vbtnFastApproach">⚡ 빠른 접근 (FAST)</button>
+          <button class="virtual-btn" id="vbtnPersonLeft">👋 사람 떠남 (LEFT)</button>
+          <button class="virtual-btn" id="vbtnLightBright">☀️ 낮 모드 (BRIGHT)</button>
+          <button class="virtual-btn" id="vbtnLightDark">🌙 밤 모드 (DARK)</button>
         </div>
       </div>
     </aside>
@@ -105,41 +106,53 @@
 
   </main>
 
-  <!-- ── Decoration Drawer (NABI MEOW catalog style) ── -->
-  <div class="drawer-backdrop" id="drawerBackdrop">
-    <div class="drawer-content">
-
-      <!-- Drawer header -->
-      <div class="drawer-header">
-        <div class="drawer-header-left">
-          <span class="drawer-brand">🐾 NABI MEOW</span>
-          <span class="drawer-subtitle">방 꾸미기 상점</span>
-        </div>
-        <button id="btnCloseDrawer" class="drawer-close-btn" aria-label="닫기">✕</button>
-      </div>
-
-      <!-- Category tabs -->
-      <div class="drawer-tabs" id="drawerSlotTabs"></div>
-
-      <!-- Items grid (populated by JS) -->
-      <div class="drawer-catalog" id="drawerItemsGrid"></div>
-
+  <!-- ── Bottom Drawer (Catalog Grid) ── -->
+  <div class="decoration-drawer" id="decorationDrawer">
+    <div class="drawer-header">
+      <h3 class="drawer-title">✨ NABI MEOW CATALOG</h3>
+      <button class="drawer-close-btn" id="btnCloseDrawer">✕</button>
     </div>
+
+    <!-- Category Tabs -->
+    <div class="drawer-tabs" id="drawerTabs">
+      <button class="drawer-tab active" data-slot="wallpaper">🎨 벽지</button>
+      <button class="drawer-tab" data-slot="floor">🪵 바닥</button>
+      <button class="drawer-tab" data-slot="bed">🛏️ 침대</button>
+      <button class="drawer-tab" data-slot="bowl">🥣 밥그릇</button>
+      <button class="drawer-tab" data-slot="catTower">🐾 캣타워</button>
+      <button class="drawer-tab" data-slot="cushion">🐟 쿠션</button>
+      <button class="drawer-tab" data-slot="toy">🧶 장난감</button>
+      <button class="drawer-tab" data-slot="window">🪟 창문</button>
+      <button class="drawer-tab" data-slot="wallDecor">🖼️ 벽장식</button>
+    </div>
+
+    <!-- 3-Column Catalog Grid -->
+    <div class="catalog-grid" id="catalogGrid"></div>
   </div>
 
   <!-- ── Onboarding Modal ── -->
-  <div class="modal-backdrop" id="onboardingBackdrop">
-    <div class="modal-box">
-      <h2>🐱 고양이 이름을 지어주세요!</h2>
-      <p style="font-size:14px;color:#666;">당신의 다마고치 고양이 이름을 입력해 주세요.</p>
-      <input type="text" id="inputCatName" class="form-input" placeholder="이름 (예: 나비)" maxlength="10" value="나비">
-      <button class="btn-primary" id="btnSaveCatName">확인</button>
+  <div class="modal-backdrop hidden" id="onboardingModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-icon">🐾</span>
+        <h2>새로운 아기 고양이 맞이하기</h2>
+      </div>
+      <p class="modal-desc">
+        다마고치 룸에 오신 것을 환영합니다!<br>
+        함께 보살필 귀여운 고양이의 이름을 지어주세요.
+      </p>
+      <div class="modal-input-group">
+        <label for="catNameInput">고양이 이름</label>
+        <input type="text" id="catNameInput" placeholder="예: 나비, 야옹이, 럭키" maxlength="10" value="나비">
+      </div>
+      <button class="modal-submit-btn" id="btnSaveCatName">시작하기 💕</button>
     </div>
   </div>
 
-  <!-- Toast -->
-  <div id="toastContainer"></div>
+  <!-- ── Toast Container ── -->
+  <div class="toast-container" id="toastContainer"></div>
 
+  <!-- JS Entry Script -->
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

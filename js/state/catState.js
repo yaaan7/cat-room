@@ -7,9 +7,9 @@ import { METRIC_LIMITS, BEHAVIOR_STATES } from '../config.js';
 export class CatState {
   constructor(initialData = {}) {
     this.name = initialData.name || '나비';
-    
+
     // 5 Key Metrics (0 - 100)
-    this.hunger = initialData.hunger !== undefined ? initialData.hunger : 30;     // Higher = hungrier
+    this.hunger = initialData.hunger !== undefined ? initialData.hunger : 30; // Higher = hungrier
     this.happiness = initialData.happiness !== undefined ? initialData.happiness : 70;
     this.affection = initialData.affection !== undefined ? initialData.affection : 20;
     this.energy = initialData.energy !== undefined ? initialData.energy : 80;
@@ -17,10 +17,11 @@ export class CatState {
 
     // Current Behavioral State (1 of 8)
     this.currentState = initialData.currentState || BEHAVIOR_STATES.IDLE;
-    
+
     // Recent interaction timestamp trackers
     this.lastPetTimes = [];
     this.isNightMode = false;
+    this.transientTimer = null;
 
     this.evaluateBehaviorState();
   }
@@ -29,7 +30,6 @@ export class CatState {
     return Math.max(METRIC_LIMITS.MIN, Math.min(METRIC_LIMITS.MAX, Math.round(val)));
   }
 
-  // Update metrics safely
   updateMetrics(delta = {}) {
     if (delta.hunger !== undefined) this.hunger = this.clamp(this.hunger + delta.hunger);
     if (delta.happiness !== undefined) this.happiness = this.clamp(this.happiness + delta.happiness);
@@ -40,16 +40,12 @@ export class CatState {
     this.evaluateBehaviorState();
   }
 
-  // Core State Machine Evaluation Rules
   evaluateBehaviorState() {
+    // If in a transient state (like temporary eating/petting/startled), don't override immediately
+    if (this.isTransient) return;
+
     if (this.stress >= 70) {
       this.currentState = BEHAVIOR_STATES.ANGRY;
-    } else if (this.currentState === BEHAVIOR_STATES.STARTLED) {
-      // Startled state maintained transiently via timeout
-    } else if (this.currentState === BEHAVIOR_STATES.SLEEPING) {
-      if (this.energy >= 95 || (!this.isNightMode && this.energy >= 80)) {
-        this.currentState = BEHAVIOR_STATES.IDLE;
-      }
     } else if (this.isNightMode || this.energy <= 20) {
       this.currentState = this.energy <= 20 ? BEHAVIOR_STATES.SLEEPY : BEHAVIOR_STATES.SLEEPING;
     } else if (this.hunger >= 70) {
@@ -63,66 +59,86 @@ export class CatState {
     }
   }
 
+  setTransientState(tempState, durationMs = 2500) {
+    if (this.transientTimer) clearTimeout(this.transientTimer);
+    this.isTransient = true;
+    this.currentState = tempState;
+
+    this.transientTimer = setTimeout(() => {
+      this.isTransient = false;
+      this.evaluateBehaviorState();
+    }, durationMs);
+  }
+
   // Action: Feed Cat
   feedCat() {
-    if (this.currentState === BEHAVIOR_STATES.SLEEPING) {
+    if (this.currentState === BEHAVIOR_STATES.SLEEPING && this.isNightMode) {
       this.updateMetrics({ stress: +25 });
-      this.currentState = BEHAVIOR_STATES.ANGRY;
+      this.setTransientState(BEHAVIOR_STATES.ANGRY, 2000);
       return { success: false, reason: 'SLEEPING_DISTURBED' };
     }
 
-    if (this.hunger <= 15) {
-      // Rejection: Cat is full
-      this.updateMetrics({ stress: +15 });
+    if (this.hunger <= 10) {
+      // Cat is completely full
+      this.updateMetrics({ stress: +10 });
       return { success: false, reason: 'FULL' };
     }
 
-    // Success Feed
-    this.updateMetrics({ hunger: -30, affection: +3, happiness: +10 });
+    // Success Feed -> Show eating pose & move near bowl for 3s
+    this.updateMetrics({ hunger: -35, affection: +3, happiness: +10 });
+    this.setTransientState(BEHAVIOR_STATES.HUNGRY, 3000);
     return { success: true, reason: 'NORMAL' };
   }
 
   // Action: Pet Cat
-  petCat(isLong = false) {
+  petCat(isLong = false, duration = 0) {
     const now = Date.now();
     this.lastPetTimes = this.lastPetTimes.filter(t => now - t < 3000);
     this.lastPetTimes.push(now);
 
-    if (this.currentState === BEHAVIOR_STATES.SLEEPING) {
+    if (this.currentState === BEHAVIOR_STATES.SLEEPING && this.isNightMode) {
       this.updateMetrics({ stress: +30 });
-      this.currentState = BEHAVIOR_STATES.ANGRY;
+      this.setTransientState(BEHAVIOR_STATES.ANGRY, 2500);
       return { success: false, reason: 'SLEEPING_DISTURBED' };
     }
 
-    // Rapid petting (4+ times in 3 seconds) causes stress
-    if (this.lastPetTimes.length >= 4 || this.stress >= 60) {
+    if (this.lastPetTimes.length >= 5 || this.stress >= 65) {
       this.updateMetrics({ stress: +20, happiness: -10 });
-      this.currentState = BEHAVIOR_STATES.ANGRY;
+      this.setTransientState(BEHAVIOR_STATES.ANGRY, 2500);
       return { success: false, reason: 'OVERPETTED' };
     }
 
-    // Success Pet
-    const bonus = isLong ? 1.5 : 1.0;
-    this.updateMetrics({ affection: +5 * bonus, happiness: +10 * bonus, stress: -5 });
-    return { success: true, reason: 'NORMAL' };
+    // Calculate pet bonus capped at max 2.5x
+    let bonus = isLong ? 1.8 : 1.0;
+    if (duration > 0) {
+      const computed = 1.0 + (duration / 1000) * 0.5;
+      bonus = Math.min(2.5, Math.max(1.0, computed));
+    }
+
+    const affGain = Math.round(5 * bonus);
+    const hapGain = Math.round(8 * bonus);
+
+    this.updateMetrics({ affection: affGain, happiness: hapGain, stress: -5 });
+    // Show petting pose
+    this.setTransientState(BEHAVIOR_STATES.ANGRY, 2500);
+    return { success: true, reason: isLong ? 'PET_LONG' : 'NORMAL' };
   }
 
   // Action: Play with Cat
   playWithCat() {
     if (this.currentState === BEHAVIOR_STATES.SLEEPING) {
       this.updateMetrics({ stress: +30 });
-      this.currentState = BEHAVIOR_STATES.ANGRY;
+      this.setTransientState(BEHAVIOR_STATES.ANGRY, 2000);
       return { success: false, reason: 'SLEEPING_DISTURBED' };
     }
 
-    if (this.energy <= 25) {
-      // Rejection: Too tired
+    if (this.energy <= 20) {
       this.updateMetrics({ stress: +10 });
       return { success: false, reason: 'TIRED' };
     }
 
-    // Success Play
-    this.updateMetrics({ happiness: +20, energy: -20, hunger: +10 });
+    this.updateMetrics({ happiness: +20, energy: -15, hunger: +10 });
+    this.setTransientState(BEHAVIOR_STATES.HAPPY, 3000);
     return { success: true, reason: 'NORMAL' };
   }
 
@@ -138,33 +154,31 @@ export class CatState {
 
   // Environment: Light changes
   setLightState(isDark) {
+    if (this.isNightMode === isDark) return false; // Prevents unnecessary re-eval
     this.isNightMode = isDark;
     if (isDark) {
       this.currentState = BEHAVIOR_STATES.SLEEPING;
       this.updateMetrics({ energy: +10 });
-    } else if (this.currentState === BEHAVIOR_STATES.SLEEPING) {
-      this.currentState = BEHAVIOR_STATES.IDLE;
+    } else {
+      this.isTransient = false;
+      this.evaluateBehaviorState();
     }
+    return true; // State changed
   }
 
   // Environment: Ultrasonic proximity approach
   handleApproach(isFast) {
     if (isFast) {
-      this.currentState = BEHAVIOR_STATES.STARTLED;
       this.updateMetrics({ stress: +15, happiness: -10 });
-      setTimeout(() => {
-        if (this.currentState === BEHAVIOR_STATES.STARTLED) {
-          this.evaluateBehaviorState();
-        }
-      }, 3000);
+      this.setTransientState(BEHAVIOR_STATES.STARTLED, 3000);
       return { success: true, reason: 'STARTLED' };
     } else {
       this.updateMetrics({ happiness: +10, affection: +2 });
+      this.setTransientState(BEHAVIOR_STATES.HAPPY, 2500);
       return { success: true, reason: 'CURIOUS' };
     }
   }
 
-  // Tick: Time Decay (30s)
   processTick() {
     if (this.currentState === BEHAVIOR_STATES.SLEEPING) {
       this.updateMetrics({ energy: +10, stress: -5 });

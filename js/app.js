@@ -36,8 +36,14 @@ class CatRoomApp {
 
     this.serialManager = new WebSerialManager(
       this.dispatcher,
-      (isConnected, msg) => this.handleSerialStatus(isConnected, msg)
+      (status, msg) => this.handleSerialStatus(status, msg)
     );
+
+    // Register Simulator for Dev Browser Console (Requirement 6)
+    window.dispatchArduinoEvent = (event) => {
+      console.log('[Arduino Event Simulator]', event);
+      this.dispatcher.dispatch(event);
+    };
 
     this.initUI();
     this.startTickLoop();
@@ -48,14 +54,14 @@ class CatRoomApp {
     new CarePanel(this.dispatcher);
     new VirtualSensorPanel(this.dispatcher);
 
-    // 4 Matched Tamagotchi Shell Buttons
+    // 4 Matched Tamagotchi Shell Buttons (Unified Game Actions)
     const btnShellFeed = document.getElementById('btnShellFeed');
     const btnShellPet = document.getElementById('btnShellPet');
     const btnShellPlay = document.getElementById('btnShellPlay');
     const btnShellSleep = document.getElementById('btnShellSleep');
 
     if (btnShellFeed) btnShellFeed.addEventListener('click', () => this.dispatcher.dispatch({ type: 'FEED', source: 'TAMAGOTCHI_BTN' }));
-    if (btnShellPet) btnShellPet.addEventListener('click', () => this.dispatcher.dispatch({ type: 'PET_SHORT', source: 'TAMAGOTCHI_BTN' }));
+    if (btnShellPet) btnShellPet.addEventListener('click', () => this.dispatcher.dispatch({ type: 'PET_SHORT', duration: 500, source: 'TAMAGOTCHI_BTN' }));
     if (btnShellPlay) btnShellPlay.addEventListener('click', () => this.dispatcher.dispatch({ type: 'PLAY', source: 'TAMAGOTCHI_BTN' }));
     if (btnShellSleep) btnShellSleep.addEventListener('click', () => this.dispatcher.dispatch({ type: 'SLEEP', source: 'TAMAGOTCHI_BTN' }));
 
@@ -86,11 +92,11 @@ class CatRoomApp {
     // Web Serial Connect Button
     const serialBtn = document.getElementById('btnSerialConnect');
     if (serialBtn) {
-      serialBtn.addEventListener('click', () => {
+      serialBtn.addEventListener('click', async () => {
         if (this.serialManager.isConnected) {
-          this.serialManager.disconnect();
+          await this.serialManager.disconnect();
         } else {
-          this.serialManager.connect();
+          await this.serialManager.connect();
         }
       });
     }
@@ -102,8 +108,7 @@ class CatRoomApp {
         ToastManager.show('📸 포토 카드를 생성하는 중...');
         const tag = STATE_TAGS[this.catState.currentState]?.label || '💬 평온함';
         await CaptureManager.captureRoomAndDownload(this.catState.name, tag, this.currentSpeechText);
-        
-        // Increment capture counter for item unlocks
+
         this.dispatcher.incrementCounter('captureCount');
         this.dispatcher.checkUnlockableItems();
         ToastManager.show('💾 이미지 저장 완료!');
@@ -130,7 +135,6 @@ class CatRoomApp {
     const badge = document.getElementById('catNameBadge');
     if (badge) badge.textContent = this.catState.name;
 
-    // Dynamically update Tamagotchi Shell title text to ♥ [Cat Name]'s Room ♥!
     const shellTitle = document.querySelector('.tamagotchi-title-text');
     if (shellTitle) shellTitle.textContent = `♥ ${this.catState.name}'s Room ♥`;
   }
@@ -142,14 +146,12 @@ class CatRoomApp {
       if (bubble) bubble.textContent = payload.reactionText;
     }
 
-    // Synchronize storageData from StorageManager so newly unlocked items and counters are NEVER overwritten
     const freshData = StorageManager.loadData();
     this.storageData.unlockedItems = freshData.unlockedItems || [];
     this.storageData.counters = freshData.counters || {};
     this.storageData.flags = freshData.flags || {};
     if (freshData.roomSlots) this.storageData.roomSlots = freshData.roomSlots;
 
-    // Auto-save State
     this.storageData.metrics = {
       hunger: this.catState.hunger,
       happiness: this.catState.happiness,
@@ -164,20 +166,35 @@ class CatRoomApp {
     this.updateHUD();
   }
 
-  handleSerialStatus(isConnected, msg) {
+  handleSerialStatus(status, msg) {
+    const serialBtn = document.getElementById('btnSerialConnect');
     const dot = document.getElementById('serialStatusDot');
+    const btnText = document.getElementById('serialBtnText');
 
-    if (dot) {
-      dot.className = `status-dot ${isConnected ? 'connected' : 'disconnected'}`;
-    }
+    if (status === 'CONNECTING') {
+      if (serialBtn) serialBtn.disabled = true;
+      if (btnText) btnText.textContent = '연결 중...';
+      if (dot) dot.className = 'status-dot connecting';
+    } else if (status === 'CONNECTED') {
+      if (serialBtn) {
+        serialBtn.disabled = false;
+        serialBtn.classList.add('connected');
+      }
+      if (btnText) btnText.textContent = '페어링됨';
+      if (dot) dot.className = 'status-dot connected';
 
-    if (isConnected) {
       this.storageData.flags.hasConnectedArduino = true;
       StorageManager.saveData(this.storageData);
       this.dispatcher.checkUnlockableItems();
-      ToastManager.show('⚡ Arduino UNO 연동 성공! 회로 장난감이 해금되었습니다.');
+      ToastManager.show('⚡ Arduino UNO 페어링 성공!');
     } else {
-      ToastManager.show(`🔌 ${msg}`);
+      if (serialBtn) {
+        serialBtn.disabled = false;
+        serialBtn.classList.remove('connected');
+      }
+      if (btnText) btnText.textContent = 'Arduino 연결';
+      if (dot) dot.className = 'status-dot disconnected';
+      ToastManager.show(`🔌 ${msg || '연결 해제됨'}`);
     }
   }
 
@@ -203,8 +220,10 @@ class CatRoomApp {
       behaviorTagEl.style.color = tagInfo.color;
     }
 
-    // Vertical Sidebar Metrics Progress Bars
-    this.setMetricBar('barHunger', 'valHunger', this.catState.hunger);
+    // Fullness = 100 - hunger (Higher hunger = lower fullness)
+    const fullness = Math.max(0, Math.min(100, 100 - this.catState.hunger));
+
+    this.setMetricBar('barHunger', 'valHunger', fullness);
     this.setMetricBar('barHappiness', 'valHappiness', this.catState.happiness);
     this.setMetricBar('barAffection', 'valAffection', this.catState.affection);
     this.setMetricBar('barEnergy', 'valEnergy', this.catState.energy);
@@ -227,7 +246,6 @@ class CatRoomApp {
   }
 }
 
-// Boot application when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
   window.catApp = new CatRoomApp();
 });

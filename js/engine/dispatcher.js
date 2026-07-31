@@ -14,11 +14,17 @@ export class GameEventDispatcher {
     this.lastEventTime = 0;
   }
 
-  // Unified Event Dispatch Handler
+  // Unified Event Dispatch Handler (Supports UI & Hardware events)
   dispatch(event) {
+    if (!event || !event.type) return;
+
+    // Debug Log 3: Game Action Dispatch
+    console.log('[Game Action]', event.type);
+
     const now = Date.now();
-    // 300ms Debounce Check
-    if (now - this.lastEventTime < GAME_CONFIG.DEBOUNCE_MS && event.type !== 'PET_LONG') {
+    // 300ms Debounce Check (Skip debounce for continuous / long events)
+    if (now - this.lastEventTime < GAME_CONFIG.DEBOUNCE_MS &&
+        event.type !== 'PET_LONG' && event.type !== 'LIGHT_BRIGHT' && event.type !== 'LIGHT_DARK') {
       return;
     }
     this.lastEventTime = now;
@@ -35,13 +41,13 @@ export class GameEventDispatcher {
       case 'PET_SHORT':
       case 'PET':
         actionName = 'PET';
-        result = this.catState.petCat(false);
+        result = this.catState.petCat(false, event.duration || 500);
         if (result.success) this.incrementCounter('petCount');
         break;
 
       case 'PET_LONG':
         actionName = 'PET';
-        result = this.catState.petCat(true);
+        result = this.catState.petCat(true, event.duration || 2000);
         if (result.success) this.incrementCounter('petCount');
         break;
 
@@ -55,23 +61,30 @@ export class GameEventDispatcher {
         break;
 
       case 'APPROACH_SLOW':
+        actionName = 'APPROACH_SLOW';
         result = this.catState.handleApproach(false);
         break;
 
       case 'APPROACH_FAST':
+        actionName = 'APPROACH_FAST';
         result = this.catState.handleApproach(true);
         break;
 
       case 'PERSON_LEFT':
+        actionName = 'PERSON_LEFT';
         this.catState.evaluateBehaviorState();
         break;
 
       case 'LIGHT_DARK':
-        this.catState.setLightState(true);
+        actionName = 'LIGHT_DARK';
+        const darkChanged = this.catState.setLightState(true);
+        result = { success: darkChanged, reason: 'NORMAL' };
         break;
 
       case 'LIGHT_BRIGHT':
-        this.catState.setLightState(false);
+        actionName = 'LIGHT_BRIGHT';
+        const brightChanged = this.catState.setLightState(false);
+        result = { success: brightChanged, reason: 'NORMAL' };
         break;
 
       default:
@@ -98,6 +111,7 @@ export class GameEventDispatcher {
 
   incrementCounter(counterKey) {
     const data = this.storageManager.loadData();
+    if (!data.counters) data.counters = {};
     data.counters[counterKey] = (data.counters[counterKey] || 0) + 1;
     this.storageManager.saveData(data);
   }

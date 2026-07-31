@@ -121,9 +121,18 @@ body {
   border-radius: 50%;
   background-color: #a4b0be;
 }
+.status-dot.connecting {
+  background-color: #ffa500;
+  box-shadow: 0 0 8px #ffa500;
+  animation: statusBlink 0.8s infinite alternate;
+}
 .status-dot.connected {
   background-color: #2ed573;
   box-shadow: 0 0 8px #2ed573;
+}
+@keyframes statusBlink {
+  from { opacity: 0.3; }
+  to { opacity: 1; }
 }
 
 /* 3-Column 100vh Dashboard Grid */
