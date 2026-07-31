@@ -2,143 +2,207 @@
   Cat Room - Arduino UNO Physical Computing Sketch
   2026 Summer Arduino x Prototyping Camp
   
-  Pin Mapping:
-  - D2: Capacitive Touch Sensor (Pet input)
-  - D3: Feed Button (Pushbutton)
-  - A0: Light Sensor / LDR (Day/Night input)
-  - D4: Ultrasonic Trig
-  - D5: Ultrasonic Echo
-  - D8: Piezo Buzzer (Audio output)
-  - D9: Servo Motor (Cat Tail output)
-  - D10: Status LED Green
-  - D11: Status LED Red
+  직코 쉴드 및 현재 연결 기준 핀맵:
+  - A3: Feed Button (Pushbutton, INPUT_PULLUP)
+  - A0: Light Sensor / LDR
+  - D9:  Pet Sensor (IR 적외선 감지, INPUT_PULLUP)
+  - D13: Ultrasonic Trig
+  - D12: Ultrasonic Echo
+  - D6:  Piezo Buzzer
+  - D7:  NeoPixel (4구)
+  - D8:  Servo Motor (Cat Tail)
 */
 
 #include <Servo.h>
+#include <Adafruit_NeoPixel.h>
 
-const int PIN_TOUCH = 2;
-const int PIN_BUTTON_FEED = 3;
-const int PIN_TRIG = 4;
-const int PIN_ECHO = 5;
-const int PIN_BUZZER = 8;
-const int PIN_SERVO = 9;
-const int PIN_LED_GREEN = 10;
-const int PIN_LED_RED = 11;
-const int PIN_LDR = A0;
+// 직코 쉴드 및 현재 연결 기준
+constexpr uint8_t PIN_FEED_BUTTON = A3;
+constexpr uint8_t PIN_LIGHT = A0;
+
+constexpr uint8_t PIN_PET_SENSOR = 9;
+constexpr uint8_t PIN_TRIG = 13;
+constexpr uint8_t PIN_ECHO = 12;
+
+constexpr uint8_t PIN_BUZZER = 6;
+constexpr uint8_t PIN_NEOPIXEL = 7;
+constexpr uint8_t PIN_SERVO = 8;
+
+// 교안의 네오픽셀 4구 기준
+constexpr uint8_t PIXEL_COUNT = 4;
+
+// 일반적인 적외선 감지 센서는 감지 시 LOW
+constexpr bool PET_DETECTED_LEVEL = LOW;
 
 Servo tailServo;
 
-// State Variables
-bool lastTouchState = LOW;
-unsigned long touchStartTime = 0;
+Adafruit_NeoPixel pixels(
+  PIXEL_COUNT,
+  PIN_NEOPIXEL,
+  NEO_GRB + NEO_KHZ800
+);
 
-bool lastButtonFeedState = HIGH; // Pull-up mode
-unsigned long lastFeedDebounce = 0;
+bool previousFeedPressed = false;
+bool previousPetDetected = false;
 
-int lastLdrState = -1; // 0: Dark, 1: Bright
-unsigned long ldrStateChangeTime = 0;
+unsigned long previousSensorPrintTime = 0;
+unsigned long previousDistanceCheckTime = 0;
 
-unsigned long lastUltrasonicCheck = 0;
-long previousDistance = 999;
+long distanceCm = -1;
+
+void setPixelColor(
+  uint8_t red,
+  uint8_t green,
+  uint8_t blue
+) {
+  for (uint8_t index = 0; index < PIXEL_COUNT; index++) {
+    pixels.setPixelColor(
+      index,
+      pixels.Color(red, green, blue)
+    );
+  }
+
+  pixels.show();
+}
+
+long measureDistanceCm() {
+  digitalWrite(PIN_TRIG, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(PIN_TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(PIN_TRIG, LOW);
+
+  const unsigned long duration =
+    pulseIn(PIN_ECHO, HIGH, 30000UL);
+
+  if (duration == 0) {
+    return -1;
+  }
+
+  return static_cast<long>(
+    duration * 0.0343 / 2.0
+  );
+}
+
+void wagTail() {
+  tailServo.write(65);
+  delay(180);
+
+  tailServo.write(115);
+  delay(180);
+
+  tailServo.write(90);
+}
+
+void playFeedReaction() {
+  tone(PIN_BUZZER, 1500, 120);
+  setPixelColor(80, 35, 0);
+  wagTail();
+}
+
+void playPetReaction() {
+  tone(PIN_BUZZER, 1100, 80);
+  setPixelColor(0, 60, 35);
+}
 
 void setup() {
   Serial.begin(9600);
 
-  pinMode(PIN_TOUCH, INPUT);
-  pinMode(PIN_BUTTON_FEED, INPUT_PULLUP);
+  pinMode(PIN_FEED_BUTTON, INPUT_PULLUP);
+  pinMode(PIN_PET_SENSOR, INPUT_PULLUP);
+
   pinMode(PIN_TRIG, OUTPUT);
   pinMode(PIN_ECHO, INPUT);
+
   pinMode(PIN_BUZZER, OUTPUT);
-  pinMode(PIN_LED_GREEN, OUTPUT);
-  pinMode(PIN_LED_RED, OUTPUT);
 
   tailServo.attach(PIN_SERVO);
-  tailServo.write(90); // Idle position
+  tailServo.write(90);
 
-  digitalWrite(PIN_LED_GREEN, HIGH);
-  digitalWrite(PIN_LED_RED, LOW);
-  tone(PIN_BUZZER, 1000, 100);
+  pixels.begin();
+  pixels.clear();
+
+  // 시작 상태: 연한 파란색
+  setPixelColor(15, 20, 60);
+
+  tone(PIN_BUZZER, 1200, 120);
+
+  Serial.println();
+  Serial.println("=== Cat Room Hardware Test ===");
+  Serial.println("Ultrasonic: TRIG D13 / ECHO D12");
+  Serial.println("Pet sensor: D9");
+  Serial.println("NeoPixel: D7");
+  Serial.println("Servo: D8");
+  Serial.println("Light sensor: A0");
+  Serial.println("Feed button: A3");
+  Serial.println("Buzzer: D6");
 }
 
 void loop() {
-  unsigned long now = millis();
+  const unsigned long now = millis();
 
-  // 1. Touch Sensor Reading
-  bool touchState = digitalRead(PIN_TOUCH);
-  if (touchState == HIGH && lastTouchState == LOW) {
-    touchStartTime = now;
-  } else if (touchState == LOW && lastTouchState == HIGH) {
-    unsigned long duration = now - touchStartTime;
-    if (duration > 1500) {
-      Serial.print("{\"type\":\"PET_LONG\",\"duration\":");
-      Serial.print(duration);
-      Serial.println("}");
-    } else if (duration > 50) {
-      Serial.println("{\"type\":\"PET_SHORT\"}");
-    }
-    tone(PIN_BUZZER, 1200, 80);
-  }
-  lastTouchState = touchState;
+  const bool feedPressed =
+    digitalRead(PIN_FEED_BUTTON) == LOW;
 
-  // 2. Feed Button Reading
-  bool feedButtonState = digitalRead(PIN_BUTTON_FEED);
-  if (feedButtonState == LOW && lastButtonFeedState == HIGH) {
-    if (now - lastFeedDebounce > 300) {
-      Serial.println("{\"type\":\"FEED\"}");
-      tone(PIN_BUZZER, 1500, 150);
-      lastFeedDebounce = now;
-    }
-  }
-  lastButtonFeedState = feedButtonState;
+  const bool petDetected =
+    digitalRead(PIN_PET_SENSOR) == PET_DETECTED_LEVEL;
 
-  // 3. LDR Light Sensor Reading
-  int ldrVal = analogRead(PIN_LDR);
-  int currentLdrState = (ldrVal < 200) ? 0 : 1; // 0 = Dark, 1 = Bright
-  if (currentLdrState != lastLdrState) {
-    if (now - ldrStateChangeTime > 2000) { // 2 seconds hysteresis
-      if (currentLdrState == 0) {
-        Serial.print("{\"type\":\"LIGHT_DARK\",\"value\":");
-        Serial.print(ldrVal);
-        Serial.println("}");
-      } else {
-        Serial.print("{\"type\":\"LIGHT_BRIGHT\",\"value\":");
-        Serial.print(ldrVal);
-        Serial.println("}");
-      }
-      lastLdrState = currentLdrState;
-      ldrStateChangeTime = now;
-    }
+  // 먹이 버튼을 처음 눌렀을 때
+  if (feedPressed && !previousFeedPressed) {
+    Serial.println("[FEED] Button pressed");
+    playFeedReaction();
   }
 
-  // 4. Ultrasonic Proximity Reading (Every 300ms)
-  if (now - lastUltrasonicCheck > 300) {
-    digitalWrite(PIN_TRIG, LOW);
-    delayMicroseconds(2);
-    digitalWrite(PIN_TRIG, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(PIN_TRIG, LOW);
-
-    long duration = pulseIn(PIN_ECHO, HIGH, 30000); // 30ms timeout
-    if (duration > 0) {
-      long distance = duration * 0.034 / 2; // cm
-      if (distance < 50 && previousDistance >= 50) {
-        long speedEstimate = previousDistance - distance;
-        if (speedEstimate > 20) {
-          Serial.print("{\"type\":\"APPROACH_FAST\",\"distance\":");
-          Serial.print(distance);
-          Serial.println("}");
-        } else {
-          Serial.print("{\"type\":\"APPROACH_SLOW\",\"distance\":");
-          Serial.print(distance);
-          Serial.println("}");
-        }
-      } else if (distance > 80 && previousDistance <= 80) {
-        Serial.println("{\"type\":\"PERSON_LEFT\"}");
-      }
-      previousDistance = distance;
-    }
-    lastUltrasonicCheck = now;
+  // 손 감지가 시작됐을 때
+  if (petDetected && !previousPetDetected) {
+    Serial.println("[PET] Hand detected");
+    playPetReaction();
   }
 
-  delay(20);
+  // 손을 치웠을 때
+  if (!petDetected && previousPetDetected) {
+    Serial.println("[PET] Hand removed");
+
+    // 기본 상태로 복귀
+    setPixelColor(15, 20, 60);
+  }
+
+  previousFeedPressed = feedPressed;
+  previousPetDetected = petDetected;
+
+  // 초음파는 300ms마다 측정
+  if (now - previousDistanceCheckTime >= 300) {
+    previousDistanceCheckTime = now;
+    distanceCm = measureDistanceCm();
+  }
+
+  // 전체 센서 상태는 700ms마다 출력
+  if (now - previousSensorPrintTime >= 700) {
+    previousSensorPrintTime = now;
+
+    const int lightValue = analogRead(PIN_LIGHT);
+
+    Serial.print("Light=");
+    Serial.print(lightValue);
+
+    Serial.print(" | Distance=");
+
+    if (distanceCm < 0) {
+      Serial.print("NO_ECHO");
+    } else {
+      Serial.print(distanceCm);
+      Serial.print("cm");
+    }
+
+    Serial.print(" | Pet=");
+    Serial.print(
+      petDetected ? "DETECTED" : "NONE"
+    );
+
+    Serial.print(" | Feed=");
+    Serial.println(
+      feedPressed ? "PRESSED" : "RELEASED"
+    );
+  }
 }
